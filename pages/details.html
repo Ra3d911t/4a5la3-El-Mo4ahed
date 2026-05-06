@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Movie Details</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+<nav class="navbar">
+  <h2>4a5la3 El Mo4ahed</h2>
+  <ul>
+    <li><a href="../index.html">Home</a></li>
+    <li><a href="search.html">Search</a></li>
+    <li><a href="watchlist.html">Watchlist</a></li>
+    <li><a href="login.html">Login</a></li>
+    <li><a href="forum.html#forum-section">Forum</a></li>
+    <li><a href="news.html">News</a></li>
+  </ul>
+</nav>
+
+<main class="page-main" id="detailsContainer"></main>
+
+<footer>
+  <p>© 2026 Movie Portal</p>
+</footer>
+
+<script src="../js/script.js"></script>
+<script>
+  function getQueryParam(param) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(param);
+  }
+
+  function renderMovieDetails() {
+    const movieId = getQueryParam('id');
+    if (!movieId) {
+      document.getElementById('detailsContainer').innerHTML = '<p style="color:red; text-align:center;">No movie selected.</p>';
+      return;
+    }
+
+    const movie = getMovieById(movieId);
+    if (!movie) {
+      document.getElementById('detailsContainer').innerHTML = '<p style="color:red; text-align:center;">Movie not found.</p>';
+      return;
+    }
+
+    document.getElementById('detailsContainer').innerHTML = `
+      <div style="display: flex; gap: 40px; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 280px; max-width: 350px;">
+          <img src="../${movie.poster}" alt="${movie.title}" style="width: 100%; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.4);" onerror="this.src='https://via.placeholder.com/400x600?text=No+Image'">
+        </div>
+        <div style="flex: 2;">
+          <h1 style="color: #f5c518;">${movie.title} <span style="font-size: 1.2rem; color: #888;">(${movie.year})</span></h1>
+          <div class="stars" style="font-size: 1.3rem;">⭐ ${movie.rating} / 10</div>
+          <div style="margin: 20px 0;">
+            <span style="background: #333; padding: 5px 15px; border-radius: 20px; margin-right: 10px;">🎭 ${movie.genre}</span>
+            <span style="background: #333; padding: 5px 15px; border-radius: 20px;">🎬 ${movie.director}</span>
+          </div>
+          <p style="line-height: 1.6;"><strong>📖 Plot:</strong> ${movie.description}</p>
+          <div style="margin: 20px 0;">
+            <h3>🎭 Cast</h3>
+            ${movie.cast.map(actor => `<span class="cast-badge">${actor}</span>`).join('')}
+          </div>
+          <button onclick="addToWatchlist(${movie.id})" style="margin-top: 20px; padding: 12px 30px;">➕ Add to Watchlist</button>
+        </div>
+      </div>
+      <section style="margin-top: 60px;">
+        <h2>📝 User Reviews</h2>
+        ${movie.reviews.length === 0 ? '<p style="color:#888;">No reviews yet.</p>' : 
+          movie.reviews.map(review => `
+            <div class="card card-wide" style="margin-bottom: 15px; padding: 15px;">
+              <strong>👤 ${review.user}</strong>
+              <div class="stars">${'★'.repeat(Math.floor(review.rating/2))}${'☆'.repeat(5-Math.floor(review.rating/2))} (${review.rating}/10)</div>
+              <p>💬 ${review.comment}</p>
+            </div>
+          `).join('')
+        }
+      </section>
+    `;
+  }
+
+  renderMovieDetails();
+</script>
+</body>
+</html>

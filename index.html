@@ -1,0 +1,128 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Website 4a5la3 el Wo4ahed</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar">
+  <h2>4a5la3 el Wo4ahed</h2>
+  <ul>
+    <li><a href="index.html">Home</a></li>
+    <li><a href="pages/search.html">Search</a></li>
+    <li><a href="pages/watchlist.html">Watchlist</a></li>
+    <li><a href="pages/login.html">Login</a></li>
+    <li><a href="pages/forum.html#forum-section">Forum</a></li>
+    <li><a href="pages/news.html">News</a></li>
+  </ul>
+</nav>
+
+<!-- Genre Sidebar -->
+<aside class="genre-sidebar" id="genreSidebar">
+  <h3>🎭 Genres</h3>
+  <ul class="genre-list">
+    <li><a href="#" class="active" onclick="filterByGenreOnMain('all', event)">All Movies</a></li>
+    <li><a href="#" onclick="filterByGenreOnMain('series', event)">Series</a></li>
+    <li><a href="#" onclick="filterByGenreOnMain('action', event)">Action</a></li>
+    <li><a href="#" onclick="filterByGenreOnMain('sci-fi', event)">Sci-Fi</a></li>
+    <li><a href="#" onclick="filterByGenreOnMain('drama', event)">Drama</a></li>
+    <li><a href="#" onclick="filterByGenreOnMain('comedy', event)">Comedy</a></li>
+    <li><a href="#" onclick="filterByGenreOnMain('thriller', event)">Thriller</a></li>
+    <li><a href="#" onclick="filterByGenreOnMain('adventure', event)">Adventure</a></li>
+    <li><a href="#" onclick="filterByGenreOnMain('crime', event)">Crime</a></li>
+    <li><a href="#" onclick="filterByGenreOnMain('romance', event)">Romance</a></li>
+    <li><a href="#" onclick="filterByGenreOnMain('animation', event)">Animation</a></li>
+    <li><a href="#" onclick="filterByGenreOnMain('superhero', event)">Superhero</a></li>
+    <li><a href="#" onclick="filterByGenreOnMain('social', event)">Social</a></li>
+  </ul>
+</aside>
+
+<!-- Mobile Menu Toggle -->
+<button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+
+<!-- Main Content -->
+<div class="main-content-with-sidebar">
+
+<!-- Hero -->
+<section class="hero">
+  <h1>Welcome to Website 4a5la3 el Wo4ahed</h1>
+  <p>Discover Movies & TV Shows</p>
+</section>
+
+<!-- Featured Today Section -->
+<section class="featured-section">
+  <div class="featured-header">
+    <h2>✨ Featured Today <span>🔥 Hot!</span></h2>
+    <p>Hand-picked recommendations just for you</p>
+  </div>
+  <div class="featured-slider" id="featuredSlider">
+    <!-- Featured items will be loaded here by JavaScript -->
+  </div>
+  <div class="featured-nav">
+    <button class="prev-btn" onclick="scrollFeatured(-300)">◀</button>
+    <button class="next-btn" onclick="scrollFeatured(300)">▶</button>
+  </div>
+</section>
+
+<!-- Most Popular Celebrities Section -->
+<section class="celebrities-section">
+  <div class="celebrities-header">
+    <h2>⭐ Most Popular Celebrities <span>🔥 Trending</span></h2>
+    <p>Your favorite stars from movies and TV shows</p>
+  </div>
+  <div class="celebrities-slider" id="celebritiesSlider">
+    <!-- Celebrities will be loaded here by JavaScript -->
+  </div>
+  <div class="celebrities-nav">
+    <button onclick="scrollCelebrities(-200)">◀</button>
+    <button onclick="scrollCelebrities(200)">▶</button>
+  </div>
+</section>
+
+<!-- What to Watch Section -->
+<section class="what-to-watch-section">
+  <div class="what-to-watch-header">
+    <h2>🍿 What to Watch</h2>
+    <p>Based on your interests and trending now</p>
+  </div>
+  <div class="what-to-watch-grid" id="whatToWatchGrid">
+    <!-- Recommendations will be loaded here -->
+  </div>
+</section>
+
+<!-- Top 10 This Week Section -->
+<section class="top10-section">
+  <div class="top10-header">
+    <h2>🏆 Top 10 <span>This Week</span></h2>
+    <p>Highest rated movies and series of all time</p>
+  </div>
+  <div class="top10-list" id="top10List">
+    <!-- Top 10 list will be loaded here -->
+  </div>
+</section>
+
+<!-- Trending Movies Row -->
+<section class="trending-section">
+  <h2 style="padding-left: 20px;">🔥 Trending Now</h2>
+  <div class="trending-slider" id="trendingMovies">
+    <!-- Trending movies will be loaded here -->
+  </div>
+</section>
+
+<!-- All Movies Grid -->
+<section class="movies" id="homeMoviesSection">
+  <h2 style="padding-left: 20px;">🎬 All Movies</h2>
+  <div class="cards" id="movieList"></div>
+</section>
+
+</div>
+
+<footer>
+  <p>© 2026 Movie Portal</p>
+</footer>
+
+<script src="js/script.js"></script>
+</body>
+</html>

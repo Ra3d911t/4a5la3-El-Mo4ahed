@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — Movie cave</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .admin-login { max-width: 400px; margin: 24px auto; padding: 24px; background: #1a1a1a; border-radius: 12px; border: 1px solid #333; }
+    .admin-panel { display: none; }
+    .admin-panel.visible { display: block; }
+    .mod-item { background: #1f1f1f; border: 1px solid #333; border-radius: 8px; padding: 12px; margin-bottom: 10px; }
+    .mod-item button { margin-top: 8px; }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <h2>Movie cave</h2>
+  <ul>
+    <li><a href="../index.html">Home</a></li>
+    <li><a href="search.html">Search</a></li>
+    <li><a href="compare.html">Compare</a></li>
+    <li><a href="watchlist.html">Watchlist</a></li>
+    <li><a href="forum.html#forum-section">Forum</a></li>
+    <li><a href="news.html">News</a></li>
+    <li><a href="exclusive.html">Exclusive</a></li>
+    <li><a href="subscribe.html">Subscribe</a></li>
+    <li><a href="contact.html">Contact</a></li>
+    <li><a href="signup.html">Register</a></li>
+    <li><a href="login.html">Login</a></li>
+    <li><a href="admin.html">Admin</a></li>
+  </ul>
+</nav>
+
+<main class="page-main">
+  <h1>Content moderation (demo)</h1>
+  <p style="color:#888;max-width:640px;">Class project admin panel: remove user reviews and forum posts stored in <code>localStorage</code>. Default password: <strong>admin123</strong></p>
+
+  <div class="admin-login" id="adminLoginBox">
+    <label for="adminPass">Password</label>
+    <input type="password" id="adminPass" autocomplete="current-password" style="width:100%;padding:10px;margin:8px 0;border-radius:8px;background:#121212;color:#fff;border:1px solid #444;">
+    <button type="button" id="adminLoginBtn" style="padding:10px 20px;border-radius:8px;cursor:pointer;background:#e50914;color:#fff;border:none;font-weight:bold;">Unlock panel</button>
+    <p id="adminLoginMsg" style="color:#f88;margin-top:10px;"></p>
+  </div>
+
+  <div class="admin-panel" id="adminPanel">
+    <p style="color:#8f8;">Session active on this browser.</p>
+    <button type="button" id="adminLogout" style="margin-bottom:24px;padding:8px 16px;border-radius:8px;cursor:pointer;">Lock panel</button>
+
+    <h2>User reviews (<span id="reviewCount">0</span>)</h2>
+    <div id="adminReviews"></div>
+
+    <h2 style="margin-top:32px;">Forum posts (<span id="forumCount">0</span>)</h2>
+    <div id="adminForum"></div>
+  </div>
+</main>
+
+<footer>
+  <p>© 2026 Movie cave</p>
+</footer>
+
+<script src="../js/script.js"></script>
+<script>
+(function () {
+  const SESSION_KEY = 'mc_admin_session';
+  const DEMO_PASS = 'admin123';
+  const REVIEWS_KEY = 'movieReviews';
+  const FORUM_KEY = 'forumPosts';
+
+  const loginBox = document.getElementById('adminLoginBox');
+  const panel = document.getElementById('adminPanel');
+  const msg = document.getElementById('adminLoginMsg');
+
+  function esc(s) {
+    if (s == null) return '';
+    const d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+  }
+
+  function isAuthed() {
+    return sessionStorage.getItem(SESSION_KEY) === '1';
+  }
+
+  function showPanel() {
+    loginBox.style.display = 'none';
+    panel.classList.add('visible');
+    renderAll();
+  }
+
+  function hidePanel() {
+    sessionStorage.removeItem(SESSION_KEY);
+    loginBox.style.display = 'block';
+    panel.classList.remove('visible');
+  }
+
+  function renderReviews() {
+    const el = document.getElementById('adminReviews');
+    const reviews = JSON.parse(localStorage.getItem(REVIEWS_KEY) || '[]');
+    document.getElementById('reviewCount').textContent = String(reviews.length);
+    if (!reviews.length) {
+      el.innerHTML = '<p style="color:#888;">No reviews.</p>';
+      return;
+    }
+    el.innerHTML = reviews.map(function (r, i) {
+      return '<div class="mod-item" data-review-index="' + i + '"><strong>' + esc(r.movie) + '</strong> — ' + esc(r.rating) + '/5<p>' + esc(r.text) + '</p><button type="button" class="del-review">Remove</button></div>';
+    }).join('');
+  }
+
+  function renderForum() {
+    const el = document.getElementById('adminForum');
+    const posts = JSON.parse(localStorage.getItem(FORUM_KEY) || '[]');
+    document.getElementById('forumCount').textContent = String(posts.length);
+    if (!posts.length) {
+      el.innerHTML = '<p style="color:#888;">No posts.</p>';
+      return;
+    }
+    el.innerHTML = posts.map(function (p) {
+      return '<div class="mod-item" data-post-id="' + esc(p.id) + '"><strong>' + esc(p.title) + '</strong><p class="post-meta">By ' + esc(p.author || 'Guest') + '</p><p>' + esc(p.body) + '</p><button type="button" class="del-post">Remove post</button></div>';
+    }).join('');
+  }
+
+  function renderAll() {
+    renderReviews();
+    renderForum();
+  }
+
+  document.getElementById('adminLoginBtn').addEventListener('click', function () {
+    const v = document.getElementById('adminPass').value;
+    if (v === DEMO_PASS) {
+      sessionStorage.setItem(SESSION_KEY, '1');
+      msg.textContent = '';
+      showPanel();
+    } else {
+      msg.textContent = 'Wrong password.';
+    }
+  });
+
+  document.getElementById('adminLogout').addEventListener('click', hidePanel);
+
+  document.getElementById('adminReviews').addEventListener('click', function (e) {
+    if (!isAuthed() || !e.target.classList.contains('del-review')) return;
+    const item = e.target.closest('.mod-item');
+    const i = parseInt(item.getAttribute('data-review-index'), 10);
+    let reviews = JSON.parse(localStorage.getItem(REVIEWS_KEY) || '[]');
+    reviews.splice(i, 1);
+    localStorage.setItem(REVIEWS_KEY, JSON.stringify(reviews));
+    renderReviews();
+  });
+
+  document.getElementById('adminForum').addEventListener('click', function (e) {
+    if (!isAuthed() || !e.target.classList.contains('del-post')) return;
+    const item = e.target.closest('.mod-item');
+    const id = item.getAttribute('data-post-id');
+    let posts = JSON.parse(localStorage.getItem(FORUM_KEY) || '[]');
+    posts = posts.filter(function (p) { return String(p.id) !== id; });
+    localStorage.setItem(FORUM_KEY, JSON.stringify(posts));
+    renderForum();
+  });
+
+  if (isAuthed()) showPanel();
+})();
+</script>
+</body>
+</html>

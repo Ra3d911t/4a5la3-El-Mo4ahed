@@ -12,10 +12,16 @@
   <ul>
     <li><a href="index.html">Home</a></li>
     <li><a href="pages/search.html">Search</a></li>
+    <li><a href="pages/compare.html">Compare</a></li>
     <li><a href="pages/watchlist.html">Watchlist</a></li>
-    <li><a href="pages/login.html">Login</a></li>
     <li><a href="pages/forum.html#forum-section">Forum</a></li>
     <li><a href="pages/news.html">News</a></li>
+    <li><a href="pages/exclusive.html">Exclusive</a></li>
+    <li><a href="pages/subscribe.html">Subscribe</a></li>
+    <li><a href="pages/contact.html">Contact</a></li>
+    <li><a href="pages/signup.html">Register</a></li>
+    <li><a href="pages/login.html">Login</a></li>
+    <li><a href="pages/admin.html">Admin</a></li>
   </ul>
 </nav>
 
@@ -122,6 +128,23 @@
 <!-- All Movies Grid -->
 <section class="movies" id="homeMoviesSection">
   <h2 style="padding-left: 20px;">🎬 All Movies</h2>
+  <div class="browse-toolbar">
+    <div class="browse-toolbar-inner">
+      <label for="homeSortSelect">Sort by
+        <select id="homeSortSelect" aria-label="Sort movie list">
+          <option value="popular">Popularity (rating)</option>
+          <option value="year_desc">Newest (year)</option>
+          <option value="year_asc">Oldest (year)</option>
+          <option value="title">Title (A–Z)</option>
+        </select>
+      </label>
+      <label for="homeYearSelect">Release year
+        <select id="homeYearSelect" aria-label="Filter by release year">
+          <option value="all">All years</option>
+        </select>
+      </label>
+    </div>
+  </div>
   <div class="cards" id="movieList"></div>
 </section>
 

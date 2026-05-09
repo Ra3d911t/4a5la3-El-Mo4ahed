@@ -43,10 +43,16 @@
   <ul>
     <li><a href="../index.html">Home</a></li>
     <li><a href="search.html">Search</a></li>
+    <li><a href="compare.html">Compare</a></li>
     <li><a href="watchlist.html">Watchlist</a></li>
-    <li><a href="login.html">Login</a></li>
     <li><a href="forum.html#forum-section">Forum</a></li>
     <li><a href="news.html">News</a></li>
+    <li><a href="exclusive.html">Exclusive</a></li>
+    <li><a href="subscribe.html">Subscribe</a></li>
+    <li><a href="contact.html">Contact</a></li>
+    <li><a href="signup.html">Register</a></li>
+    <li><a href="login.html">Login</a></li>
+    <li><a href="admin.html">Admin</a></li>
   </ul>
 </nav>
 
@@ -76,13 +82,27 @@
 <!-- Main Content -->
 <div class="main-content-with-sidebar">
   <div class="search-container">
-    <h1>🔍 Search Movies</h1>
-    <input type="text" id="searchInput" placeholder="Type movie name, genre, or director...">
-    
-        
+    <h1>🔍 Search Movies &amp; TV Shows</h1>
+    <input type="text" id="searchInput" placeholder="Title, genre, director, or year…">
+    <div class="browse-toolbar" style="padding-left:0;padding-right:0;">
+      <div class="browse-toolbar-inner">
+        <label for="searchSortSelect">Sort by
+          <select id="searchSortSelect" aria-label="Sort search results">
+            <option value="popular">Popularity (rating)</option>
+            <option value="year_desc">Newest (year)</option>
+            <option value="year_asc">Oldest (year)</option>
+            <option value="title">Title (A–Z)</option>
+          </select>
+        </label>
+        <label for="searchYearSelect">Release year
+          <select id="searchYearSelect" aria-label="Filter results by year">
+            <option value="all">All years</option>
+          </select>
+        </label>
+      </div>
+    </div>
     <div class="cards" id="searchResults"></div>
   </div>
-</div>
 </div>
 
 <footer>

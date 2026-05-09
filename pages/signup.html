@@ -164,8 +164,16 @@
   <ul>
     <li><a href="../index.html">Home</a></li>
     <li><a href="search.html">Search</a></li>
+    <li><a href="compare.html">Compare</a></li>
     <li><a href="watchlist.html">Watchlist</a></li>
+    <li><a href="forum.html#forum-section">Forum</a></li>
+    <li><a href="news.html">News</a></li>
+    <li><a href="exclusive.html">Exclusive</a></li>
+    <li><a href="subscribe.html">Subscribe</a></li>
+    <li><a href="contact.html">Contact</a></li>
+    <li><a href="signup.html">Register</a></li>
     <li><a href="login.html">Login</a></li>
+    <li><a href="admin.html">Admin</a></li>
   </ul>
 </nav>
 
@@ -219,6 +227,7 @@
   <p>© 2026 Movie cave. All rights reserved.</p>
 </footer>
 
+<script src="../js/script.js"></script>
 <script>
   // Password strength checker
   const passwordInput = document.getElementById('signupPassword');
@@ -292,13 +301,23 @@
       messageBox.style.color = '#ff8888';
     }
     else {
+      const fullName = firstName + ' ' + lastName;
+      if (typeof registerUserAccount === 'function') {
+        const res = registerUserAccount(fullName, email, password);
+        if (!res.ok) {
+          messageBox.innerHTML = '❌ ' + res.message;
+          messageBox.style.background = 'rgba(229, 9, 20, 0.15)';
+          messageBox.style.color = '#ff8888';
+          return;
+        }
+      }
       messageBox.innerHTML = '✅ Account created successfully! Redirecting to Login...';
       messageBox.style.background = 'rgba(76, 175, 80, 0.15)';
       messageBox.style.color = '#88ff88';
-      
+
       localStorage.setItem('newUserEmail', email);
-      localStorage.setItem('newUserName', firstName + ' ' + lastName);
-      
+      localStorage.setItem('newUserName', fullName);
+
       setTimeout(function() {
         window.location.href = 'login.html';
       }, 2000);

@@ -13,10 +13,16 @@
   <ul>
     <li><a href="../index.html">Home</a></li>
     <li><a href="search.html">Search</a></li>
+    <li><a href="compare.html">Compare</a></li>
     <li><a href="watchlist.html">Watchlist</a></li>
-    <li><a href="login.html">Login</a></li>
     <li><a href="forum.html#forum-section">Forum</a></li>
     <li><a href="news.html">News</a></li>
+    <li><a href="exclusive.html">Exclusive</a></li>
+    <li><a href="subscribe.html">Subscribe</a></li>
+    <li><a href="contact.html">Contact</a></li>
+    <li><a href="signup.html">Register</a></li>
+    <li><a href="login.html">Login</a></li>
+    <li><a href="admin.html">Admin</a></li>
   </ul>
 </nav>
 
@@ -28,6 +34,13 @@
 
 <script src="../js/script.js"></script>
 <script>
+  function escDetails(s) {
+    if (s == null) return '';
+    const d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+  }
+
   function getQueryParam(param) {
     const urlParams = new URLSearchParams(window.location.search);
     return urlParams.get(param);
@@ -46,6 +59,24 @@
       return;
     }
 
+    const yt = typeof getTrailerYoutubeId === 'function' ? getTrailerYoutubeId(movie) : null;
+    const trailerSection = yt
+      ? `<div class="detail-trailer"><h2>🎬 Trailer &amp; clips</h2><p style="color:#888;font-size:14px;">Official trailer (YouTube).</p><div class="ratio"><iframe src="https://www.youtube-nocookie.com/embed/${yt}" title="Trailer" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div></div>`
+      : `<div class="detail-trailer"><h2>🎬 Trailer &amp; clips</h2><p style="color:#888;">No embedded trailer for this title yet. Try a <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(movie.title + ' trailer')}" target="_blank" rel="noopener">YouTube search</a>.</p></div>`;
+
+    const merged = typeof mergeReviewsForDisplay === 'function' ? mergeReviewsForDisplay(movie) : (movie.reviews || []);
+    const reviewsHtml = merged.length === 0
+      ? '<p style="color:#888;">No reviews yet. Be the first below.</p>'
+      : merged.map(review => `
+            <div class="card card-wide" style="margin-bottom: 15px; padding: 15px;">
+              <strong>👤 ${escDetails(review.user)}</strong>
+              <div class="stars">${'★'.repeat(Math.floor(review.rating/2))}${'☆'.repeat(5-Math.floor(review.rating/2))} (${review.rating}/10)</div>
+              <p>💬 ${escDetails(review.comment)}</p>
+            </div>
+          `).join('');
+
+    const typeLabel = (movie.mediaType || 'movie').toLowerCase() === 'series' ? 'TV Series' : 'Movie';
+
     document.getElementById('detailsContainer').innerHTML = `
       <div style="display: flex; gap: 40px; flex-wrap: wrap;">
         <div style="flex: 1; min-width: 280px; max-width: 350px;">
@@ -53,6 +84,7 @@
         </div>
         <div style="flex: 2;">
           <h1 style="color: #f5c518;">${movie.title} <span style="font-size: 1.2rem; color: #888;">(${movie.year})</span></h1>
+          <p style="color:#aaa;">${typeLabel}</p>
           <div class="stars" style="font-size: 1.3rem;">⭐ ${movie.rating} / 10</div>
           <div style="margin: 20px 0;">
             <span style="background: #333; padding: 5px 15px; border-radius: 20px; margin-right: 10px;">🎭 ${movie.genre}</span>
@@ -63,22 +95,58 @@
             <h3>🎭 Cast</h3>
             ${movie.cast.map(actor => `<span class="cast-badge">${actor}</span>`).join('')}
           </div>
-          <button onclick="addToWatchlist(${movie.id})" style="margin-top: 20px; padding: 12px 30px;">➕ Add to Watchlist</button>
+          <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:20px;">
+            <button type="button" onclick="addToWatchlist(${movie.id})" style="padding: 12px 24px;">➕ Add to Watchlist</button>
+            <a href="compare.html?id=${movie.id}" style="display:inline-block;padding:12px 24px;background:#333;color:#f5c518;border-radius:8px;text-decoration:none;">⚖️ Compare titles</a>
+          </div>
         </div>
       </div>
-      <section style="margin-top: 60px;">
-        <h2>📝 User Reviews</h2>
-        ${movie.reviews.length === 0 ? '<p style="color:#888;">No reviews yet.</p>' : 
-          movie.reviews.map(review => `
-            <div class="card card-wide" style="margin-bottom: 15px; padding: 15px;">
-              <strong>👤 ${review.user}</strong>
-              <div class="stars">${'★'.repeat(Math.floor(review.rating/2))}${'☆'.repeat(5-Math.floor(review.rating/2))} (${review.rating}/10)</div>
-              <p>💬 ${review.comment}</p>
-            </div>
-          `).join('')
-        }
+      ${trailerSection}
+      <section style="margin-top: 48px;">
+        <h2>📝 Rate &amp; review</h2>
+        <form id="detailReviewForm" class="form-stack" style="max-width:520px;">
+          <label for="detailReviewUser">Your name (optional)</label>
+          <input type="text" id="detailReviewUser" placeholder="Guest">
+          <label for="detailReviewStars">Your rating (1–5)</label>
+          <select id="detailReviewStars" required>
+            <option value="5">5 — Excellent</option>
+            <option value="4">4 — Very good</option>
+            <option value="3">3 — Good</option>
+            <option value="2">2 — Fair</option>
+            <option value="1">1 — Poor</option>
+          </select>
+          <label for="detailReviewText">Review</label>
+          <textarea id="detailReviewText" rows="4" required placeholder="Share your thoughts…"></textarea>
+          <button type="submit">Submit review</button>
+        </form>
+      </section>
+      <section style="margin-top: 40px;">
+        <h2>📝 User reviews &amp; ratings</h2>
+        ${reviewsHtml}
       </section>
     `;
+
+    const drf = document.getElementById('detailReviewForm');
+    if (drf) {
+      drf.onsubmit = function (e) {
+        e.preventDefault();
+        const text = document.getElementById('detailReviewText').value.trim();
+        const rating = parseInt(document.getElementById('detailReviewStars').value, 10);
+        const user = document.getElementById('detailReviewUser').value.trim() || 'Guest';
+        if (!text || rating < 1 || rating > 5) return;
+        try {
+          const key = 'movieReviews';
+          const reviews = JSON.parse(localStorage.getItem(key) || '[]');
+          reviews.unshift({ movie: movie.title, rating, text, user });
+          localStorage.setItem(key, JSON.stringify(reviews));
+        } catch (err) {
+          alert('Could not save review.');
+          return;
+        }
+        drf.reset();
+        renderMovieDetails();
+      };
+    }
   }
 
   renderMovieDetails();

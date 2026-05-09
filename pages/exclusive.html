@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Exclusive — Movie cave</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+<nav class="navbar">
+  <h2>Movie cave</h2>
+  <ul>
+    <li><a href="../index.html">Home</a></li>
+    <li><a href="search.html">Search</a></li>
+    <li><a href="compare.html">Compare</a></li>
+    <li><a href="watchlist.html">Watchlist</a></li>
+    <li><a href="forum.html#forum-section">Forum</a></li>
+    <li><a href="news.html">News</a></li>
+    <li><a href="exclusive.html">Exclusive</a></li>
+    <li><a href="subscribe.html">Subscribe</a></li>
+    <li><a href="contact.html">Contact</a></li>
+    <li><a href="signup.html">Register</a></li>
+    <li><a href="login.html">Login</a></li>
+    <li><a href="admin.html">Admin</a></li>
+  </ul>
+</nav>
+
+<main class="page-main" id="exclusiveMain"></main>
+
+<footer>
+  <p>© 2026 Movie cave</p>
+</footer>
+
+<script src="../js/script.js"></script>
+<script>
+(function () {
+  const main = document.getElementById('exclusiveMain');
+  const tier = typeof getSubscriptionTier === 'function' ? getSubscriptionTier() : null;
+  if (!tier) {
+    main.innerHTML =
+      '<h1>Exclusive content</h1>' +
+      '<p style="color:#888;max-width:560px;">This area is for Movie cave+ members. Subscribe to unlock bonus interviews, BTS galleries, and curated lists.</p>' +
+      '<p><a href="subscribe.html" style="color:#f5c518;">View subscription plans →</a></p>';
+    return;
+  }
+  main.innerHTML =
+    '<h1>Welcome, ' + tier + ' member</h1>' +
+    '<p style="color:#888;">Here is sample exclusive material (demo content).</p>' +
+    '<div class="cards" style="margin-top:24px;">' +
+    '<article class="card card-wide"><h3>🎬 Director roundtable</h3><p>Extended discussion with filmmakers about adapting sci‑fi for the screen (placeholder).</p></article>' +
+    '<article class="card card-wide"><h3>🎭 Cast Q&amp;A</h3><p>Bonus Q&amp;A session from a recent festival panel (placeholder).</p></article>' +
+    '<article class="card card-wide"><h3>📰 Industry briefing</h3><p>Monthly note on streaming windows and box office trends (placeholder).</p></article>' +
+    '</div>';
+})();
+</script>
+</body>
+</html>

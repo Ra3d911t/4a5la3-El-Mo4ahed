@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Compare — Movie cave</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+<nav class="navbar">
+  <h2>Movie cave</h2>
+  <ul>
+    <li><a href="../index.html">Home</a></li>
+    <li><a href="search.html">Search</a></li>
+    <li><a href="compare.html">Compare</a></li>
+    <li><a href="watchlist.html">Watchlist</a></li>
+    <li><a href="forum.html#forum-section">Forum</a></li>
+    <li><a href="news.html">News</a></li>
+    <li><a href="exclusive.html">Exclusive</a></li>
+    <li><a href="subscribe.html">Subscribe</a></li>
+    <li><a href="contact.html">Contact</a></li>
+    <li><a href="signup.html">Register</a></li>
+    <li><a href="login.html">Login</a></li>
+    <li><a href="admin.html">Admin</a></li>
+  </ul>
+</nav>
+
+<main class="page-main compare-page">
+  <h1>⚖️ Compare movies &amp; series</h1>
+  <p style="color:#888;max-width:720px;">Pick two titles from the catalog to compare ratings, year, genre, cast size, and more.</p>
+
+  <div class="browse-toolbar-inner" style="margin-top:20px;">
+    <label>Title A
+      <select id="compareA" aria-label="First title"></select>
+    </label>
+    <label>Title B
+      <select id="compareB" aria-label="Second title"></select>
+    </label>
+    <button type="button" id="compareSwap" style="padding:10px 18px;border-radius:8px;cursor:pointer;background:#333;color:#f5c518;border:1px solid #555;">⇄ Swap</button>
+  </div>
+
+  <div id="compareTableWrap"></div>
+</main>
+
+<footer>
+  <p>© 2026 Movie cave</p>
+</footer>
+
+<script src="../js/script.js"></script>
+<script>
+(function () {
+  const selA = document.getElementById('compareA');
+  const selB = document.getElementById('compareB');
+  const wrap = document.getElementById('compareTableWrap');
+  if (!selA || !selB || !wrap || typeof moviesDatabase === 'undefined') return;
+
+  function opts() {
+    return moviesDatabase
+      .slice()
+      .sort((a, b) => a.title.localeCompare(b.title))
+      .map(m => {
+        const tag = (m.mediaType || '').toLowerCase() === 'series' ? 'TV' : 'Film';
+        return '<option value="' + m.id + '">' + escDetails(m.title) + ' (' + m.year + ', ' + tag + ')</option>';
+      }).join('');
+  }
+
+  function escDetails(s) {
+    if (s == null) return '';
+    const d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+  }
+
+  selA.innerHTML = opts();
+  selB.innerHTML = opts();
+
+  const params = new URLSearchParams(window.location.search);
+  const idA = params.get('id');
+  const idB = params.get('with');
+  if (idA && [...selA.options].some(o => o.value === idA)) selA.value = idA;
+  if (idB && [...selB.options].some(o => o.value === idB)) selB.value = idB;
+  if (selA.value === selB.value && selB.options[1]) selB.selectedIndex = 1;
+
+  function row(label, a, b) {
+    return '<tr><th>' + escDetails(label) + '</th><td>' + a + '</td><td>' + b + '</td></tr>';
+  }
+
+  function render() {
+    const a = moviesDatabase.find(m => String(m.id) === selA.value);
+    const b = moviesDatabase.find(m => String(m.id) === selB.value);
+    if (!a || !b) {
+      wrap.innerHTML = '<p style="color:#888;">Select two titles.</p>';
+      return;
+    }
+    const type = m => (m.mediaType || '').toLowerCase() === 'series' ? 'TV Series' : 'Movie';
+    const castList = m => (m.cast || []).join(', ');
+    wrap.innerHTML =
+      '<table>' +
+      '<thead><tr><th>Field</th><th>' + escDetails(a.title) + '</th><th>' + escDetails(b.title) + '</th></tr></thead><tbody>' +
+      row('Type', escDetails(type(a)), escDetails(type(b))) +
+      row('Year', escDetails(String(a.year)), escDetails(String(b.year))) +
+      row('Rating (/10)', escDetails(String(a.rating)), escDetails(String(b.rating))) +
+      row('Genre', escDetails(a.genre), escDetails(b.genre)) +
+      row('Director', escDetails(a.director), escDetails(b.director)) +
+      row('Cast (count)', escDetails(String((a.cast || []).length)), escDetails(String((b.cast || []).length))) +
+      row('Cast', escDetails(castList(a)), escDetails(castList(b))) +
+      row('Plot', escDetails(a.description), escDetails(b.description)) +
+      '</tbody></table>' +
+      '<p style="margin-top:16px;"><a href="details.html?id=' + a.id + '">Open details: ' + escDetails(a.title) + '</a> · ' +
+      '<a href="details.html?id=' + b.id + '">' + escDetails(b.title) + '</a></p>';
+  }
+
+  selA.addEventListener('change', function () {
+    if (selA.value === selB.value) {
+      const other = [...selB.options].find(o => o.value !== selA.value);
+      if (other) selB.value = other.value;
+    }
+    render();
+    history.replaceState(null, '', 'compare.html?id=' + encodeURIComponent(selA.value) + '&with=' + encodeURIComponent(selB.value));
+  });
+  selB.addEventListener('change', function () {
+    if (selA.value === selB.value) {
+      const other = [...selA.options].find(o => o.value !== selB.value);
+      if (other) selA.value = other.value;
+    }
+    render();
+    history.replaceState(null, '', 'compare.html?id=' + encodeURIComponent(selA.value) + '&with=' + encodeURIComponent(selB.value));
+  });
+
+  document.getElementById('compareSwap').addEventListener('click', function () {
+    const t = selA.value;
+    selA.value = selB.value;
+    selB.value = t;
+    render();
+    history.replaceState(null, '', 'compare.html?id=' + encodeURIComponent(selA.value) + '&with=' + encodeURIComponent(selB.value));
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

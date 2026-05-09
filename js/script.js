@@ -621,9 +621,63 @@ const moviesDatabase = [
   
 ];
 
+/** YouTube video IDs for trailers (demo). Optional per-movie override: movie.trailerYoutubeId */
+const TRAILER_IDS = {
+  Inception: "YoHD9XAuDmE",
+  "Breaking Bad": "HhesaQXLuRY",
+  Interstellar: "zSWdZVtXT7E",
+  Adrift: "M89r7QYdPTk",
+  "Avatar: Fire and Ash": "d9MyW72ELq0",
+  "Dune: Part Three": "Way9Dexny3w",
+  "Fantastic Four: First Steps": "pzq61wWRP4Y",
+  "John Wick": "C0BMx-qxsP4",
+  Lucy: "MNpoTeykPKM",
+  "The Mechanic": "CMpuqBKYd8g",
+  "Mission: Impossible - The Final Reckoning": "NOhDyUmT9z0",
+  Thunderbolts: "v-94OjhKVFI",
+  "Spider-Man: Miles Morales": "shW_Wi2KHuk",
+  "The Wire": "yjc_3cZ9d4M",
+  Succession: "77Psqa6osws",
+  Dark: "rrwycJ08S0k"
+};
+
+function getTrailerYoutubeId(movie) {
+  if (!movie) return null;
+  if (movie.trailerYoutubeId) return movie.trailerYoutubeId;
+  return TRAILER_IDS[movie.title] || null;
+}
+
 function getMovieById(id) {
   return moviesDatabase.find(movie => movie.id === parseInt(id));
 }
+
+// ——— Subscription (demo, localStorage) ———
+const SUBSCRIPTION_KEY = "mc_subscription_tier";
+const SUBSCRIPTION_UNTIL_KEY = "mc_subscription_until";
+
+function getSubscriptionTier() {
+  try {
+    const until = localStorage.getItem(SUBSCRIPTION_UNTIL_KEY);
+    if (until && Date.now() > parseInt(until, 10)) {
+      localStorage.removeItem(SUBSCRIPTION_KEY);
+      localStorage.removeItem(SUBSCRIPTION_UNTIL_KEY);
+      return null;
+    }
+    return localStorage.getItem(SUBSCRIPTION_KEY);
+  } catch {
+    return null;
+  }
+}
+
+function setSubscriptionTier(tier, daysValid) {
+  const days = typeof daysValid === "number" ? daysValid : 365;
+  const until = Date.now() + days * 86400000;
+  localStorage.setItem(SUBSCRIPTION_KEY, tier);
+  localStorage.setItem(SUBSCRIPTION_UNTIL_KEY, String(until));
+}
+
+window.getSubscriptionTier = getSubscriptionTier;
+window.setSubscriptionTier = setSubscriptionTier;
 
 // ========================
 // SHARED HELPERS (used across forum, reviews, etc.)
@@ -661,6 +715,59 @@ function displaySearchResults(movies) {
   }).join("");
 }
 
+function populateBrowseYearSelect(selectId) {
+  const sel = document.getElementById(selectId);
+  if (!sel || sel.dataset.populated === "1") return;
+  const years = [...new Set(moviesDatabase.map(m => m.year))].sort((a, b) => b - a);
+  const current = sel.value;
+  sel.innerHTML = '<option value="all">All years</option>' + years.map(y => `<option value="${y}">${y}</option>`).join("");
+  if (current && [...sel.options].some(o => o.value === current)) sel.value = current;
+  sel.dataset.populated = "1";
+}
+
+function sortMovieListCopy(list, sort) {
+  const out = list.slice();
+  if (sort === "popular") out.sort((a, b) => b.rating - a.rating);
+  else if (sort === "year_desc") out.sort((a, b) => b.year - a.year);
+  else if (sort === "year_asc") out.sort((a, b) => a.year - b.year);
+  else if (sort === "title") out.sort((a, b) => a.title.localeCompare(b.title));
+  return out;
+}
+
+function applyHomeBrowseAndDisplay() {
+  const movieList = document.getElementById("movieList");
+  if (!movieList || !window._homeFiltered) return;
+  let list = window._homeFiltered.slice();
+  const yearSel = document.getElementById("homeYearSelect");
+  const sortSel = document.getElementById("homeSortSelect");
+  const yearVal = yearSel && yearSel.value !== "all" ? parseInt(yearSel.value, 10) : null;
+  if (yearVal) list = list.filter(m => m.year === yearVal);
+  const sort = sortSel ? sortSel.value : "popular";
+  list = sortMovieListCopy(list, sort);
+  if (list.length === 0) {
+    movieList.innerHTML = `
+      <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #888;">
+        <h3>No titles match</h3>
+        <p>Try another year or sort option</p>
+      </div>`;
+    return;
+  }
+  displayMovies(list);
+}
+
+function applySearchBrowseAndDisplay() {
+  const searchResultsEl = document.getElementById("searchResults");
+  if (!searchResultsEl || !window._searchFiltered) return;
+  let list = window._searchFiltered.slice();
+  const yearSel = document.getElementById("searchYearSelect");
+  const sortSel = document.getElementById("searchSortSelect");
+  const yearVal = yearSel && yearSel.value !== "all" ? parseInt(yearSel.value, 10) : null;
+  if (yearVal) list = list.filter(m => m.year === yearVal);
+  const sort = sortSel ? sortSel.value : "popular";
+  list = sortMovieListCopy(list, sort);
+  displaySearchResults(list);
+}
+
 function performSearch() {
   const searchInput = document.getElementById("searchInput");
   const searchResults = document.getElementById("searchResults");
@@ -668,15 +775,16 @@ function performSearch() {
 
   const query = searchInput.value.toLowerCase().trim();
   if (query === "") {
-    displaySearchResults(moviesDatabase);
+    window._searchFiltered = moviesDatabase.slice();
   } else {
-    const filtered = moviesDatabase.filter(movie =>
+    window._searchFiltered = moviesDatabase.filter(movie =>
       movie.title.toLowerCase().includes(query) ||
       movie.genre.toLowerCase().includes(query) ||
-      (movie.director && movie.director.toLowerCase().includes(query))
+      (movie.director && movie.director.toLowerCase().includes(query)) ||
+      String(movie.year).includes(query)
     );
-    displaySearchResults(filtered);
   }
+  applySearchBrowseAndDisplay();
 }
 
 const searchInput = document.getElementById("searchInput");
@@ -705,13 +813,22 @@ if (searchInput && searchResults) {
       });
     }
 
-    displaySearchResults(filteredMovies);
+    window._searchFiltered = filteredMovies.slice();
+    populateBrowseYearSelect("searchYearSelect");
+    applySearchBrowseAndDisplay();
+  } else {
+    window._searchFiltered = moviesDatabase.slice();
+    populateBrowseYearSelect("searchYearSelect");
+    applySearchBrowseAndDisplay();
   }
 
   searchInput.addEventListener("input", performSearch);
   searchInput.addEventListener("keyup", performSearch);
 
-  displaySearchResults(moviesDatabase);
+  ["searchSortSelect", "searchYearSelect"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener("change", () => applySearchBrowseAndDisplay());
+  });
 
   console.log("🔍 Search page loaded with " + moviesDatabase.length + " movies");
 }
@@ -753,22 +870,14 @@ window.filterSearchByGenre = function (genre, ev) {
     if (!searchResultsEl) return;
 
     if (filteredMovies.length === 0) {
+      window._searchFiltered = [];
       searchResultsEl.innerHTML = '<p style="color:#888; text-align:center; padding:50px; font-size:1.2rem;">✨ No movies found in this genre.</p>';
       return;
     }
 
-    searchResultsEl.innerHTML = filteredMovies.map(movie => {
-      let posterPath = "../" + movie.poster;
-      return `
-        <div class="card" onclick="window.location.href='details.html?id=${movie.id}'" style="cursor: pointer;">
-          <img src="${posterPath}" alt="${movie.title}" onerror="this.src='https://via.placeholder.com/300x450?text=No+Image'">
-          <h3>${movie.title}</h3>
-          <p>⭐ ${movie.rating}</p>
-          <p style="color:#aaa; font-size:0.75rem;">${movie.year} • ${movie.genre}</p>
-          <button onclick="event.stopPropagation(); addToWatchlist(${movie.id})">Add</button>
-        </div>
-      `;
-    }).join("");
+    window._searchFiltered = filteredMovies.slice();
+    populateBrowseYearSelect("searchYearSelect");
+    applySearchBrowseAndDisplay();
   } catch (error) {
     console.error("Error in filterSearchByGenre:", error);
   }
@@ -781,7 +890,13 @@ const movieList = document.getElementById("movieList");
 const trendingMovies = document.getElementById("trendingMovies");
 
 if (movieList) {
-  displayMovies(moviesDatabase);
+  window._homeFiltered = moviesDatabase.filter(m => (m.mediaType || "").toLowerCase() === "movie");
+  populateBrowseYearSelect("homeYearSelect");
+  applyHomeBrowseAndDisplay();
+  ["homeSortSelect", "homeYearSelect"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener("change", () => applyHomeBrowseAndDisplay());
+  });
 }
 
 // Load trending movies (top rated)
@@ -870,7 +985,8 @@ window.filterByGenreOnMain = function(genre, ev) {
       }
     }
     
-    displayMovies(filteredMovies);
+    window._homeFiltered = filteredMovies;
+    applyHomeBrowseAndDisplay();
 
     // Scroll to the movies section on home page
     const homeMoviesSection = document.getElementById("homeMoviesSection") || document.getElementById("movieList");
@@ -878,18 +994,6 @@ window.filterByGenreOnMain = function(genre, ev) {
       homeMoviesSection.scrollIntoView({ behavior: "smooth", block: "start" });
     }
     
-    // Show message if no movies found
-    if (filteredMovies.length === 0) {
-      const movieList = document.getElementById('movieList');
-      if (movieList) {
-        movieList.innerHTML = `
-          <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #888;">
-            <h3>No results found</h3>
-            <p>Try selecting a different genre</p>
-          </div>
-        `;
-      }
-    }
   } catch (error) {
     console.error('Error in filterByGenreOnMain:', error);
   }
@@ -1353,6 +1457,64 @@ function ratingStarsHtml(n) {
 function normalizeText(s) {
   return String(s || "").toLowerCase().trim();
 }
+
+const USERS_KEY = "mc_registered_users";
+
+window.registerUserAccount = function (name, email, password) {
+  try {
+    const users = JSON.parse(localStorage.getItem(USERS_KEY) || "[]");
+    if (users.some(u => normalizeText(u.email) === normalizeText(email))) {
+      return { ok: false, message: "This email is already registered." };
+    }
+    users.push({
+      name: String(name || "").trim(),
+      email: String(email || "").trim(),
+      password,
+      createdAt: Date.now()
+    });
+    localStorage.setItem(USERS_KEY, JSON.stringify(users));
+    return { ok: true };
+  } catch {
+    return { ok: false, message: "Could not save account." };
+  }
+};
+
+window.tryLoginRegisteredUser = function (email, password) {
+  try {
+    const users = JSON.parse(localStorage.getItem(USERS_KEY) || "[]");
+    const u = users.find(x => normalizeText(x.email) === normalizeText(email));
+    return !!(u && u.password === password);
+  } catch {
+    return false;
+  }
+};
+
+window.getStoredReviewsForMovieTitle = getStoredReviewsForMovieTitle;
+
+function getStoredReviewsForMovieTitle(movieTitle) {
+  const key = normalizeText(movieTitle);
+  if (!key) return [];
+  try {
+    const reviews = JSON.parse(localStorage.getItem(REVIEWS_KEY)) || [];
+    return reviews.filter(r => normalizeText(r.movie) === key);
+  } catch {
+    return [];
+  }
+}
+
+function mergeReviewsForDisplay(movie) {
+  const fromDb = Array.isArray(movie.reviews) ? movie.reviews : [];
+  const stored = getStoredReviewsForMovieTitle(movie.title);
+  const mapped = stored.map(r => ({
+    user: r.user || "Community",
+    rating: r.rating * 2,
+    comment: r.text
+  }));
+  return [...mapped, ...fromDb];
+}
+
+window.mergeReviewsForDisplay = mergeReviewsForDisplay;
+window.getTrailerYoutubeId = getTrailerYoutubeId;
 
 function loadReviews(filterMovieQuery = "") {
   if (!reviewsList) return;

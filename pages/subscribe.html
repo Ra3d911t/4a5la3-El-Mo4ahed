@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Subscribe — Movie cave</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+<nav class="navbar">
+  <h2>Movie cave</h2>
+  <ul>
+    <li><a href="../index.html">Home</a></li>
+    <li><a href="search.html">Search</a></li>
+    <li><a href="compare.html">Compare</a></li>
+    <li><a href="watchlist.html">Watchlist</a></li>
+    <li><a href="forum.html#forum-section">Forum</a></li>
+    <li><a href="news.html">News</a></li>
+    <li><a href="exclusive.html">Exclusive</a></li>
+    <li><a href="subscribe.html">Subscribe</a></li>
+    <li><a href="contact.html">Contact</a></li>
+    <li><a href="signup.html">Register</a></li>
+    <li><a href="login.html">Login</a></li>
+    <li><a href="admin.html">Admin</a></li>
+  </ul>
+</nav>
+
+<main class="page-main">
+  <h1>⭐ Movie cave+ subscription</h1>
+  <p style="color:#888;max-width:640px;">Demo only: choosing a plan saves your tier in the browser (<code>localStorage</code>) and unlocks the <a href="exclusive.html">Exclusive</a> area for this device.</p>
+  <p id="subStatus" style="color:#f5c518;"></p>
+
+  <div class="subscribe-plans">
+    <div class="plan-card">
+      <h2>Free</h2>
+      <p style="color:#aaa;">Browse, search, watchlist, and community features.</p>
+      <p><strong>$0</strong> / month</p>
+      <button type="button" id="planFree" style="margin-top:12px;padding:10px 20px;border-radius:8px;cursor:pointer;">Stay on Free</button>
+    </div>
+    <div class="plan-card featured">
+      <h2>Premium</h2>
+      <p style="color:#aaa;">Exclusive clips, early news highlights, and ad‑free browsing (simulated).</p>
+      <p><strong>$7.99</strong> / month</p>
+      <button type="button" id="planPremium" style="margin-top:12px;padding:10px 20px;border-radius:8px;cursor:pointer;background:#f5c518;color:#121212;border:none;font-weight:bold;">Choose Premium</button>
+    </div>
+    <div class="plan-card">
+      <h2>Family</h2>
+      <p style="color:#aaa;">Everything in Premium for up to 5 profiles (demo).</p>
+      <p><strong>$11.99</strong> / month</p>
+      <button type="button" id="planFamily" style="margin-top:12px;padding:10px 20px;border-radius:8px;cursor:pointer;">Choose Family</button>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <p>© 2026 Movie cave</p>
+</footer>
+
+<script src="../js/script.js"></script>
+<script>
+(function () {
+  const status = document.getElementById('subStatus');
+  function refresh() {
+    const t = typeof getSubscriptionTier === 'function' ? getSubscriptionTier() : null;
+    status.textContent = t ? ('Current plan: ' + t + ' — thank you!') : 'You are on the free plan.';
+  }
+  refresh();
+  document.getElementById('planFree').addEventListener('click', function () {
+    localStorage.removeItem('mc_subscription_tier');
+    localStorage.removeItem('mc_subscription_until');
+    alert('You are on the free tier.');
+    refresh();
+  });
+  document.getElementById('planPremium').addEventListener('click', function () {
+    if (typeof setSubscriptionTier === 'function') setSubscriptionTier('premium', 365);
+    alert('Premium activated (demo). Visit Exclusive content!');
+    refresh();
+  });
+  document.getElementById('planFamily').addEventListener('click', function () {
+    if (typeof setSubscriptionTier === 'function') setSubscriptionTier('family', 365);
+    alert('Family plan activated (demo).');
+    refresh();
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,7 +1,7 @@
 // ========================
 // CENTRAL MOVIES DATABASE
 // ========================
-const bundledMoviesDatabase = [
+const moviesDatabase = [
   {
     id: 1,
     title: "Inception",
@@ -621,50 +621,6 @@ const bundledMoviesDatabase = [
   
 ];
 
-const MOVIES_CATALOG_KEY = "mc_movies_catalog";
-let _moviesDbCache = null;
-
-function invalidateMoviesDbCache() {
-  _moviesDbCache = null;
-}
-
-function getMoviesDb() {
-  if (_moviesDbCache) return _moviesDbCache;
-  try {
-    const raw = localStorage.getItem(MOVIES_CATALOG_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        _moviesDbCache = parsed;
-        return _moviesDbCache;
-      }
-    }
-  } catch (e) {
-    console.warn("Movies catalog parse error", e);
-  }
-  _moviesDbCache = bundledMoviesDatabase;
-  return _moviesDbCache;
-}
-
-function saveMoviesCatalogToStorage(list) {
-  localStorage.setItem(MOVIES_CATALOG_KEY, JSON.stringify(list));
-  invalidateMoviesDbCache();
-  _moviesDbCache = list;
-}
-
-function resetMoviesCatalogToBundledDefault() {
-  localStorage.removeItem(MOVIES_CATALOG_KEY);
-  invalidateMoviesDbCache();
-}
-
-window.saveMoviesCatalogToStorage = saveMoviesCatalogToStorage;
-window.resetMoviesCatalogToBundledDefault = resetMoviesCatalogToBundledDefault;
-window.invalidateMoviesDbCache = invalidateMoviesDbCache;
-window.getMoviesDb = getMoviesDb;
-window.getBundledMoviesDefault = function () {
-  return JSON.parse(JSON.stringify(bundledMoviesDatabase));
-};
-
 /** YouTube video IDs for trailers (demo). Optional per-movie override: movie.trailerYoutubeId */
 const TRAILER_IDS = {
   Inception: "YoHD9XAuDmE",
@@ -692,7 +648,7 @@ function getTrailerYoutubeId(movie) {
 }
 
 function getMovieById(id) {
-  return getMoviesDb().find(movie => movie.id === parseInt(id, 10));
+  return moviesDatabase.find(movie => movie.id === parseInt(id));
 }
 
 // ——— Subscription (demo, localStorage) ———
@@ -762,7 +718,7 @@ function displaySearchResults(movies) {
 function populateBrowseYearSelect(selectId) {
   const sel = document.getElementById(selectId);
   if (!sel || sel.dataset.populated === "1") return;
-  const years = [...new Set(getMoviesDb().map(m => m.year))].sort((a, b) => b - a);
+  const years = [...new Set(moviesDatabase.map(m => m.year))].sort((a, b) => b - a);
   const current = sel.value;
   sel.innerHTML = '<option value="all">All years</option>' + years.map(y => `<option value="${y}">${y}</option>`).join("");
   if (current && [...sel.options].some(o => o.value === current)) sel.value = current;
@@ -819,9 +775,9 @@ function performSearch() {
 
   const query = searchInput.value.toLowerCase().trim();
   if (query === "") {
-    window._searchFiltered = getMoviesDb().slice();
+    window._searchFiltered = moviesDatabase.slice();
   } else {
-    window._searchFiltered = getMoviesDb().filter(movie =>
+    window._searchFiltered = moviesDatabase.filter(movie =>
       movie.title.toLowerCase().includes(query) ||
       movie.genre.toLowerCase().includes(query) ||
       (movie.director && movie.director.toLowerCase().includes(query)) ||
@@ -848,10 +804,10 @@ if (searchInput && searchResults) {
       }
     });
 
-    let filteredMovies = getMoviesDb();
+    let filteredMovies = moviesDatabase;
 
     if (genreParam !== "all") {
-      filteredMovies = getMoviesDb().filter(movie => {
+      filteredMovies = moviesDatabase.filter(movie => {
         const movieGenres = movie.genre.toLowerCase();
         return movieGenres.includes(genreParam.toLowerCase());
       });
@@ -861,7 +817,7 @@ if (searchInput && searchResults) {
     populateBrowseYearSelect("searchYearSelect");
     applySearchBrowseAndDisplay();
   } else {
-    window._searchFiltered = getMoviesDb().slice();
+    window._searchFiltered = moviesDatabase.slice();
     populateBrowseYearSelect("searchYearSelect");
     applySearchBrowseAndDisplay();
   }
@@ -874,7 +830,7 @@ if (searchInput && searchResults) {
     if (el) el.addEventListener("change", () => applySearchBrowseAndDisplay());
   });
 
-  console.log("🔍 Search page loaded with " + getMoviesDb().length + " movies");
+  console.log("🔍 Search page loaded with " + moviesDatabase.length + " movies");
 }
 
 window.filterSearchByGenre = function (genre, ev) {
@@ -893,14 +849,14 @@ window.filterSearchByGenre = function (genre, ev) {
     }
 
     const g = String(genre || "all").toLowerCase();
-    let filteredMovies = getMoviesDb();
+    let filteredMovies = moviesDatabase;
 
     if (g === "all") {
-      filteredMovies = getMoviesDb().filter(m => (m.mediaType || "").toLowerCase() === "movie");
+      filteredMovies = moviesDatabase.filter(m => (m.mediaType || "").toLowerCase() === "movie");
     } else if (g === "series") {
-      filteredMovies = getMoviesDb().filter(m => (m.mediaType || "").toLowerCase() === "series");
+      filteredMovies = moviesDatabase.filter(m => (m.mediaType || "").toLowerCase() === "series");
     } else {
-      filteredMovies = getMoviesDb().filter(movie => {
+      filteredMovies = moviesDatabase.filter(movie => {
         const movieGenres = String(movie.genre || "").toLowerCase();
         const isMatch = movieGenres.includes(g);
         console.log("Movie:", movie.title, "Genre:", movie.genre, "Match:", isMatch);
@@ -934,7 +890,7 @@ const movieList = document.getElementById("movieList");
 const trendingMovies = document.getElementById("trendingMovies");
 
 if (movieList) {
-  window._homeFiltered = getMoviesDb().filter(m => (m.mediaType || "").toLowerCase() === "movie");
+  window._homeFiltered = moviesDatabase.filter(m => (m.mediaType || "").toLowerCase() === "movie");
   populateBrowseYearSelect("homeYearSelect");
   applyHomeBrowseAndDisplay();
   ["homeSortSelect", "homeYearSelect"].forEach(id => {
@@ -945,7 +901,7 @@ if (movieList) {
 
 // Load trending movies (top rated)
 if (trendingMovies) {
-  const trending = getMoviesDb()
+  const trending = moviesDatabase
     .sort((a, b) => b.rating - a.rating)
     .slice(0, 10); // Top 10 rated movies
   
@@ -997,16 +953,16 @@ window.filterByGenreOnMain = function(genre, ev) {
     }
     
     const g = String(genre || "all").toLowerCase();
-    let filteredMovies = getMoviesDb();
+    let filteredMovies = moviesDatabase;
 
     // Default "All Movies" on home = mediaType movie
     if (g === "all") {
-      filteredMovies = getMoviesDb().filter(m => (m.mediaType || "").toLowerCase() === "movie");
+      filteredMovies = moviesDatabase.filter(m => (m.mediaType || "").toLowerCase() === "movie");
     } else if (g === "series") {
-      filteredMovies = getMoviesDb().filter(m => (m.mediaType || "").toLowerCase() === "series");
+      filteredMovies = moviesDatabase.filter(m => (m.mediaType || "").toLowerCase() === "series");
     } else {
       // Genre filter shows BOTH movies + series that match this genre
-      filteredMovies = getMoviesDb().filter(movie => {
+      filteredMovies = moviesDatabase.filter(movie => {
         const movieGenres = String(movie.genre || "").toLowerCase();
         const isMatch = movieGenres.includes(g);
         console.log('Movie:', movie.title, 'Genre:', movie.genre, 'Match:', isMatch);
@@ -1057,7 +1013,7 @@ function loadFeaturedToday() {
   if (!featuredContainer) return;
 
   // Select 6 random movies/TV shows from the database
-  const shuffled = [...getMoviesDb()];
+  const shuffled = [...moviesDatabase];
   for (let i = shuffled.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
@@ -1259,7 +1215,7 @@ function loadWhatToWatch() {
   if (!container) return;
 
   // Get 4 random movies/series
-  const shuffled = [...getMoviesDb()];
+  const shuffled = [...moviesDatabase];
   for (let i = shuffled.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
@@ -1284,7 +1240,7 @@ function loadTop10() {
   if (!container) return;
 
   // Sort by rating (highest first) and take top 10
-  const top10 = [...getMoviesDb()].sort((a, b) => b.rating - a.rating).slice(0, 10);
+  const top10 = [...moviesDatabase].sort((a, b) => b.rating - a.rating).slice(0, 10);
 
   container.innerHTML = top10.map((item, index) => {
     let rankClass = "";
@@ -1334,10 +1290,10 @@ function loadPopularInterests() {
 
 function filterByInterest(filter) {
   if (filter === "series") {
-    const seriesCount = getMoviesDb().filter(m => m.mediaType === "series").length;
+    const seriesCount = moviesDatabase.filter(m => m.mediaType === "series").length;
     alert(`📺 We have ${seriesCount} TV Series in our database!\n\nCheck them out in the Search page!`);
   } else {
-    const count = getMoviesDb().filter(m => m.genre.includes(filter)).length;
+    const count = moviesDatabase.filter(m => m.genre.includes(filter)).length;
     alert(`🎬 ${filter} category has ${count} titles!\n\nGo to Search page and type "${filter}" to find them!`);
   }
 }
@@ -1385,7 +1341,7 @@ if (watchDiv) {
     `;
   } else {
     // Get all movies in watchlist
-    allWatchlistMovies = list.map(id => getMoviesDb().find(m => m.id === id)).filter(m => m);
+    allWatchlistMovies = list.map(id => moviesDatabase.find(m => m.id === id)).filter(m => m);
     displayWatchlistMovies(allWatchlistMovies);
   }
 }
@@ -1584,9 +1540,9 @@ function loadReviews(filterMovieQuery = "") {
 if (reviewForm && reviewsList) {
   loadReviews();
 
-  // Autocomplete for movie name (from getMoviesDb())
-  if (movieNameSuggestions && Array.isArray(getMoviesDb())) {
-    const titles = [...new Set(getMoviesDb().map(m => m && m.title).filter(Boolean))]
+  // Autocomplete for movie name (from moviesDatabase)
+  if (movieNameSuggestions && Array.isArray(moviesDatabase)) {
+    const titles = [...new Set(moviesDatabase.map(m => m && m.title).filter(Boolean))]
       .sort((a, b) => a.localeCompare(b));
     movieNameSuggestions.innerHTML = titles
       .map(t => `<option value="${escapeHtml(t)}"></option>`)

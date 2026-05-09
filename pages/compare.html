@@ -53,10 +53,10 @@
   const selA = document.getElementById('compareA');
   const selB = document.getElementById('compareB');
   const wrap = document.getElementById('compareTableWrap');
-  if (!selA || !selB || !wrap || typeof getMoviesDb !== 'function') return;
+  if (!selA || !selB || !wrap || typeof moviesDatabase === 'undefined') return;
 
   function opts() {
-    return getMoviesDb()
+    return moviesDatabase
       .slice()
       .sort((a, b) => a.title.localeCompare(b.title))
       .map(m => {
@@ -87,8 +87,8 @@
   }
 
   function render() {
-    const a = getMoviesDb().find(m => String(m.id) === selA.value);
-    const b = getMoviesDb().find(m => String(m.id) === selB.value);
+    const a = moviesDatabase.find(m => String(m.id) === selA.value);
+    const b = moviesDatabase.find(m => String(m.id) === selB.value);
     if (!a || !b) {
       wrap.innerHTML = '<p style="color:#888;">Select two titles.</p>';
       return;

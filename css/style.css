@@ -997,6 +997,745 @@ footer {
   margin-top: 25px;
 }
 
+/* ======================== */
+/* Login & Register Pages */
+/* ======================== */
+.login-page {
+  min-height: calc(100vh - 140px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  background: #0a0a0a;
+}
+
+.login-wrapper {
+  width: 100%;
+  max-width: 450px;
+  margin: 0 auto;
+}
+
+.login-card {
+  background: #141414;
+  border-radius: 20px;
+  padding: 45px 40px;
+  border: 1px solid #2a2a2a;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+.login-card h1 {
+  font-size: 32px;
+  margin-bottom: 10px;
+  text-align: center;
+  color: #f5c518;
+}
+
+.login-subtitle {
+  text-align: center;
+  color: #aaa;
+  margin-bottom: 35px;
+  font-size: 14px;
+}
+
+.input-group {
+  margin-bottom: 25px;
+}
+
+.login-form label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 13px;
+  color: #ccc;
+}
+
+.login-form input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid #333;
+  border-radius: 10px;
+  background: #1e1e1e;
+  color: #fff;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.login-form input:focus {
+  outline: none;
+  border-color: #f5c518;
+}
+
+.password-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.password-wrapper input {
+  width: 100%;
+  padding-right: 45px;
+  box-sizing: border-box;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #aaa;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+.toggle-password:hover {
+  color: #f5c518;
+}
+
+.form-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 20px 0 30px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #bbb;
+  cursor: pointer;
+}
+
+.checkbox-label input {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+}
+
+.forgot-link {
+  color: #f5c518;
+  text-decoration: none;
+  font-size: 13px;
+}
+
+.forgot-link:hover {
+  text-decoration: underline;
+}
+
+.login-submit-btn {
+  width: 100%;
+  background: #f5c518;
+  color: white;
+  border: none;
+  padding: 14px;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.login-submit-btn:hover {
+  background: #d4a017;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 25px 0 20px;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid #333;
+}
+
+.divider span {
+  padding: 0 15px;
+  color: #888;
+  font-size: 12px;
+}
+
+.social-login {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.social-btn {
+  flex: 1;
+  padding: 12px;
+  border: 1px solid #333;
+  border-radius: 10px;
+  background: #1a1a1a;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s;
+}
+
+.social-btn:hover {
+  border-color: #f5c518;
+  background: #252525;
+}
+
+.message-box {
+  padding: 12px;
+  margin: 15px 0;
+  border-radius: 10px;
+  text-align: center;
+  font-size: 13px;
+  display: none;
+}
+
+.signup-redirect {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 13px;
+  color: #aaa;
+}
+
+.signup-redirect a {
+  color: #f5c518;
+  text-decoration: none;
+}
+
+.signup-redirect a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 500px) {
+  .login-card {
+    padding: 30px 25px;
+  }
+  .social-login {
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+
+/* ======================== */
+/* Signup Page */
+/* ======================== */
+.signup-page {
+  min-height: calc(100vh - 140px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  background: #0a0a0a;
+}
+
+.signup-wrapper {
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.signup-card {
+  background: #141414;
+  border-radius: 20px;
+  padding: 45px 40px;
+  border: 1px solid #2a2a2a;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+.signup-card h1 {
+  font-size: 32px;
+  margin-bottom: 10px;
+  text-align: center;
+  color: #f5c518;
+}
+
+.signup-subtitle {
+  text-align: center;
+  color: #aaa;
+  margin-bottom: 35px;
+  font-size: 14px;
+}
+
+.signup-form label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 13px;
+  color: #ccc;
+}
+
+.signup-form input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid #333;
+  border-radius: 10px;
+  background: #1e1e1e;
+  color: #fff;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.signup-form input:focus {
+  outline: none;
+  border-color: #f5c518;
+}
+
+.name-row {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 5px;
+}
+
+.name-row .input-group {
+  flex: 1;
+  margin-bottom: 20px;
+}
+
+.password-strength {
+  font-size: 11px;
+  margin-top: 5px;
+  padding: 5px 10px;
+  border-radius: 8px;
+  display: inline-block;
+}
+
+.password-strength.weak {
+  color: #ff8888;
+  background: rgba(255, 68, 68, 0.1);
+}
+
+.password-strength.medium {
+  color: #ffcc44;
+  background: rgba(255, 204, 68, 0.1);
+}
+
+.password-strength.strong {
+  color: #88ff88;
+  background: rgba(136, 255, 136, 0.1);
+}
+
+.signup-btn {
+  width: 100%;
+  background: #f5c518;
+  color: white;
+  border: none;
+  padding: 14px;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.3s;
+  margin-top: 10px;
+}
+
+.signup-btn:hover {
+  background: #d4a017;
+}
+
+.login-link {
+  text-align: center;
+  margin-top: 25px;
+}
+
+.login-link a {
+  color: #f5c518;
+  text-decoration: none;
+  font-size: 13px;
+}
+
+.login-link a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 550px) {
+  .signup-card {
+    padding: 30px 25px;
+  }
+  .name-row {
+    flex-direction: column;
+    gap: 0;
+  }
+}
+
+/* ======================== */
+/* Forgot Password Page */
+/* ======================== */
+.forgot-page {
+  min-height: calc(100vh - 140px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  background: #0a0a0a;
+}
+
+.forgot-wrapper {
+  width: 100%;
+  max-width: 450px;
+  margin: 0 auto;
+}
+
+.forgot-card {
+  background: #141414;
+  border-radius: 20px;
+  padding: 45px 40px;
+  border: 1px solid #2a2a2a;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+.forgot-card h1 {
+  font-size: 32px;
+  margin-bottom: 10px;
+  text-align: center;
+  color: #f5c518;
+}
+
+.forgot-subtitle {
+  text-align: center;
+  color: #aaa;
+  margin-bottom: 35px;
+  font-size: 14px;
+}
+
+.forgot-form label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 13px;
+  color: #ccc;
+}
+
+.forgot-form input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid #333;
+  border-radius: 10px;
+  background: #1e1e1e;
+  color: #fff;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.forgot-form input:focus {
+  outline: none;
+  border-color: #f5c518;
+}
+
+.forgot-btn {
+  width: 100%;
+  background: #f5c518;
+  color: white;
+  border: none;
+  padding: 14px;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.forgot-btn:hover {
+  background: #d4a017;
+}
+
+.back-link {
+  text-align: center;
+  margin-top: 25px;
+}
+
+.back-link a {
+  color: #f5c518;
+  text-decoration: none;
+  font-size: 13px;
+}
+
+.back-link a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 500px) {
+  .forgot-card {
+    padding: 30px 25px;
+  }
+}
+
+/* ======================== */
+/* Watchlist Page */
+/* ======================== */
+.watchlist-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.watchlist-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.watchlist-header h1 {
+  color: #f5c518;
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+}
+
+.watchlist-grid {
+  display: flex;
+  gap: 25px;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: 20px;
+}
+
+.watchlist-item {
+  background: linear-gradient(145deg, #1f1f1f, #2a2a2a);
+  padding: 15px;
+  width: 220px;
+  border-radius: 16px;
+  text-align: center;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(245, 197, 24, 0.1);
+}
+
+.watchlist-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, transparent, rgba(245, 197, 24, 0.1), transparent);
+  transform: translateX(-100%);
+  transition: transform 0.6s;
+}
+
+.watchlist-item:hover::before {
+  transform: translateX(100%);
+}
+
+.watchlist-item:hover {
+  transform: translateY(-12px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(245, 197, 24, 0.4);
+  border-color: rgba(245, 197, 24, 0.3);
+}
+
+.watchlist-item img {
+  width: 100%;
+  border-radius: 12px;
+  height: 280px;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.watchlist-item:hover img {
+  transform: scale(1.05);
+}
+
+.watchlist-info {
+  padding: 15px;
+}
+
+.watchlist-info h3 {
+  margin: 0 0 8px;
+  color: #f5c518;
+  font-size: 1.2rem;
+}
+
+.watchlist-info p {
+  margin: 5px 0;
+  color: #ccc;
+  font-size: 0.9rem;
+}
+
+.watchlist-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.watchlist-actions button {
+  flex: 1;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.btn-remove {
+  background: linear-gradient(135deg, #dc3545, #c82333);
+  color: white;
+}
+
+.btn-remove:hover {
+  background: linear-gradient(135deg, #c82333, #a02622);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4);
+}
+
+.btn-view {
+  background: linear-gradient(135deg, #f5c518, #e0b000);
+  color: #121212;
+}
+
+.btn-view:hover {
+  background: linear-gradient(135deg, #e0b000, #c9a000);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(245, 197, 24, 0.4);
+}
+
+.empty-watchlist {
+  text-align: center;
+  padding: 60px 20px;
+  color: #888;
+}
+
+.empty-watchlist h2 {
+  font-size: 1.8rem;
+  margin-bottom: 20px;
+}
+
+.empty-watchlist p {
+  font-size: 1.1rem;
+  margin-bottom: 30px;
+}
+
+.empty-watchlist a {
+  display: inline-block;
+  background: #f5c518;
+  color: #121212;
+  padding: 12px 24px;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: bold;
+  transition: background 0.3s;
+}
+
+.empty-watchlist a:hover {
+  background: #e0b000;
+}
+
+@media (max-width: 1200px) {
+  .watchlist-grid {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .watchlist-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 15px;
+  }
+  .watchlist-item img {
+    height: 240px;
+  }
+  .watchlist-info h3 {
+    font-size: 1rem;
+  }
+  .watchlist-info p {
+    font-size: 0.8rem;
+  }
+  .watchlist-actions button {
+    font-size: 0.75rem;
+    padding: 8px 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .watchlist-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 12px;
+  }
+  .watchlist-item img {
+    height: 200px;
+  }
+  .watchlist-info {
+    padding: 10px;
+  }
+  .watchlist-info h3 {
+    font-size: 0.9rem;
+  }
+  .watchlist-actions {
+    gap: 8px;
+  }
+}
+
+/* ======================== */
+/* Admin Panel */
+/* ======================== */
+.admin-login {
+  max-width: 400px;
+  margin: 24px auto;
+  padding: 24px;
+  background: #1a1a1a;
+  border-radius: 12px;
+  border: 1px solid #333;
+}
+
+.admin-panel {
+  display: none;
+}
+
+.admin-panel.visible {
+  display: block;
+}
+
+.mod-item {
+  background: #1f1f1f;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 10px;
+}
+
+.mod-item button {
+  margin-top: 8px;
+}
+
+/* ======================== */
+/* Search Page */
+/* ======================== */
+.search-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.search-filters {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.filter-btn {
+  background: #1f1f1f;
+  border: 1px solid #f5c518;
+  color: #f5c518;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.filter-btn:hover,
+.filter-btn.active {
+  background: #f5c518;
+  color: #121212;
+}
+
+#searchResults {
+  margin-top: 30px;
+}
+
 .featured-nav button {
   background: #1f1f1f;
   border: 1px solid #f5c518;

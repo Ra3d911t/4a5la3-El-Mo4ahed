@@ -631,7 +631,156 @@ function getMovieById(id) {
 }
 
 // ========================
-// HOME PAGE
+// SHARED HELPERS (used across forum, reviews, etc.)
+// ========================
+function escapeHtml(str) {
+  if (str == null) return "";
+  const div = document.createElement("div");
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+// ========================
+// SEARCH PAGE (pages/search.html)
+// ========================
+function displaySearchResults(movies) {
+  const searchResults = document.getElementById("searchResults");
+  if (!searchResults) return;
+
+  if (movies.length === 0) {
+    searchResults.innerHTML = '<p style="color:#888; text-align:center; padding:50px; font-size:1.2rem;">✨ No movies found. Try another title.</p>';
+    return;
+  }
+
+  searchResults.innerHTML = movies.map(movie => {
+    let posterPath = "../" + movie.poster;
+    return `
+        <div class="card" onclick="window.location.href='details.html?id=${movie.id}'" style="cursor: pointer;">
+          <img src="${posterPath}" alt="${movie.title}" onerror="this.src='https://via.placeholder.com/300x450?text=No+Image'">
+          <h3>${movie.title}</h3>
+          <p>⭐ ${movie.rating}</p>
+          <p style="color:#aaa; font-size:0.75rem;">${movie.year} • ${movie.genre}</p>
+          <button onclick="event.stopPropagation(); addToWatchlist(${movie.id})">Add</button>
+        </div>
+      `;
+  }).join("");
+}
+
+function performSearch() {
+  const searchInput = document.getElementById("searchInput");
+  const searchResults = document.getElementById("searchResults");
+  if (!searchInput || !searchResults) return;
+
+  const query = searchInput.value.toLowerCase().trim();
+  if (query === "") {
+    displaySearchResults(moviesDatabase);
+  } else {
+    const filtered = moviesDatabase.filter(movie =>
+      movie.title.toLowerCase().includes(query) ||
+      movie.genre.toLowerCase().includes(query) ||
+      (movie.director && movie.director.toLowerCase().includes(query))
+    );
+    displaySearchResults(filtered);
+  }
+}
+
+const searchInput = document.getElementById("searchInput");
+const searchResults = document.getElementById("searchResults");
+
+if (searchInput && searchResults) {
+  const urlParams = new URLSearchParams(window.location.search);
+  const genreParam = urlParams.get("genre");
+
+  if (genreParam) {
+    console.log("Auto-filtering by genre from URL:", genreParam);
+
+    document.querySelectorAll(".genre-list a").forEach(link => {
+      link.classList.remove("active");
+      if (link.href.includes("genre=" + genreParam)) {
+        link.classList.add("active");
+      }
+    });
+
+    let filteredMovies = moviesDatabase;
+
+    if (genreParam !== "all") {
+      filteredMovies = moviesDatabase.filter(movie => {
+        const movieGenres = movie.genre.toLowerCase();
+        return movieGenres.includes(genreParam.toLowerCase());
+      });
+    }
+
+    displaySearchResults(filteredMovies);
+  }
+
+  searchInput.addEventListener("input", performSearch);
+  searchInput.addEventListener("keyup", performSearch);
+
+  displaySearchResults(moviesDatabase);
+
+  console.log("🔍 Search page loaded with " + moviesDatabase.length + " movies");
+}
+
+window.filterSearchByGenre = function (genre, ev) {
+  try {
+    console.log("Filtering search by genre:", genre);
+
+    if (ev && typeof ev.preventDefault === "function") {
+      ev.preventDefault();
+    }
+
+    document.querySelectorAll(".genre-list a").forEach(link => {
+      link.classList.remove("active");
+    });
+    if (ev && ev.target) {
+      ev.target.classList.add("active");
+    }
+
+    const g = String(genre || "all").toLowerCase();
+    let filteredMovies = moviesDatabase;
+
+    if (g === "all") {
+      filteredMovies = moviesDatabase.filter(m => (m.mediaType || "").toLowerCase() === "movie");
+    } else if (g === "series") {
+      filteredMovies = moviesDatabase.filter(m => (m.mediaType || "").toLowerCase() === "series");
+    } else {
+      filteredMovies = moviesDatabase.filter(movie => {
+        const movieGenres = String(movie.genre || "").toLowerCase();
+        const isMatch = movieGenres.includes(g);
+        console.log("Movie:", movie.title, "Genre:", movie.genre, "Match:", isMatch);
+        return isMatch;
+      });
+    }
+
+    console.log("Filtered search movies count:", filteredMovies.length);
+
+    const searchResultsEl = document.getElementById("searchResults");
+    if (!searchResultsEl) return;
+
+    if (filteredMovies.length === 0) {
+      searchResultsEl.innerHTML = '<p style="color:#888; text-align:center; padding:50px; font-size:1.2rem;">✨ No movies found in this genre.</p>';
+      return;
+    }
+
+    searchResultsEl.innerHTML = filteredMovies.map(movie => {
+      let posterPath = "../" + movie.poster;
+      return `
+        <div class="card" onclick="window.location.href='details.html?id=${movie.id}'" style="cursor: pointer;">
+          <img src="${posterPath}" alt="${movie.title}" onerror="this.src='https://via.placeholder.com/300x450?text=No+Image'">
+          <h3>${movie.title}</h3>
+          <p>⭐ ${movie.rating}</p>
+          <p style="color:#aaa; font-size:0.75rem;">${movie.year} • ${movie.genre}</p>
+          <button onclick="event.stopPropagation(); addToWatchlist(${movie.id})">Add</button>
+        </div>
+      `;
+    }).join("");
+  } catch (error) {
+    console.error("Error in filterSearchByGenre:", error);
+  }
+};
+
+// ========================
+// HOME PAGE (index.html) — movie grid, trending, genres, sidebar
 // ========================
 const movieList = document.getElementById("movieList");
 const trendingMovies = document.getElementById("trendingMovies");
@@ -758,462 +907,7 @@ function toggleSidebar() {
 }
 
 // ========================
-// WATCHLIST FUNCTIONS
-// ========================
-function addToWatchlist(id) {
-  let list = JSON.parse(localStorage.getItem("watchlist")) || [];
-  if (!list.includes(id)) {
-    list.push(id);
-    localStorage.setItem("watchlist", JSON.stringify(list));
-    alert("✅ Added to watchlist!");
-  } else {
-    alert("⚠️ Already in watchlist");
-  }
-}
-
-const watchDiv = document.getElementById("watchlist");
-let allWatchlistMovies = []; // Store all watchlist movies for filtering
-
-if (watchDiv) {
-  let list = JSON.parse(localStorage.getItem("watchlist")) || [];
-  if (list.length === 0) {
-    watchDiv.innerHTML = `
-      <div class="empty-watchlist">
-        <h2>📭 Your watchlist is empty</h2>
-        <p>Start adding movies and shows you want to watch later!</p>
-        <a href="search.html">Browse Movies</a>
-      </div>
-    `;
-  } else {
-    // Get all movies in watchlist
-    allWatchlistMovies = list.map(id => moviesDatabase.find(m => m.id === id)).filter(m => m);
-    displayWatchlistMovies(allWatchlistMovies);
-  }
-}
-
-function displayWatchlistMovies(movies) {
-  if (!watchDiv) return;
-  
-  if (movies.length === 0) {
-    watchDiv.innerHTML = `
-      <div class="empty-watchlist">
-        <h2>📭 No movies found</h2>
-        <p>Try selecting a different genre</p>
-        <a href="search.html">Browse Movies</a>
-      </div>
-    `;
-    return;
-  }
-  
-  watchDiv.innerHTML = `<div class="watchlist-grid">`;
-  movies.forEach(movie => {
-    watchDiv.innerHTML += `
-      <div class="watchlist-item">
-        <img src="../${movie.poster}" alt="${movie.title}" onerror="this.src='https://via.placeholder.com/250x350?text=No+Image'">
-        <div class="watchlist-info">
-          <h3>${movie.title}</h3>
-          <p>⭐ ${movie.rating}</p>
-          <p style="color:#aaa; font-size:0.8rem;">${movie.year} • ${movie.genre}</p>
-          <div class="watchlist-actions">
-            <button class="btn-view" onclick="window.location.href='details.html?id=${movie.id}'">View Details</button>
-            <button class="btn-remove" onclick="removeFromWatchlist(${movie.id})">Remove</button>
-          </div>
-        </div>
-      </div>
-    `;
-  });
-  watchDiv.innerHTML += `</div>`;
-}
-
-// Genre/type filtering for watchlist page
-window.filterWatchlistByGenre = function(genre, ev) {
-  console.log('Filtering watchlist by genre:', genre);
-
-  if (ev && typeof ev.preventDefault === "function") ev.preventDefault();
-
-  // Update active state
-  document.querySelectorAll('.genre-list a').forEach(link => {
-    link.classList.remove('active');
-  });
-  if (ev && ev.target) ev.target.classList.add('active');
-
-  const g = String(genre || "all").toLowerCase();
-  let filteredMovies = allWatchlistMovies;
-
-  if (g === "series") {
-    filteredMovies = allWatchlistMovies.filter(m => (m.mediaType || "").toLowerCase() === "series");
-  } else if (g !== "all") {
-    filteredMovies = allWatchlistMovies.filter(movie => {
-      const movieGenres = String(movie.genre || "").toLowerCase();
-      return movieGenres.includes(g);
-    });
-  }
-
-  // Update header title
-  const header = document.querySelector('.watchlist-header h1');
-  if (header) {
-    if (g === 'all') {
-      header.textContent = '📋 My Watchlist';
-    } else if (g === "series") {
-      header.textContent = '📺 My Watchlist (Series)';
-    } else {
-      const genreName = g.charAt(0).toUpperCase() + g.slice(1);
-      header.textContent = `📋 ${genreName}`;
-    }
-  }
-
-  displayWatchlistMovies(filteredMovies);
-};
-
-function removeFromWatchlist(id) {
-  let list = JSON.parse(localStorage.getItem("watchlist")) || [];
-  list = list.filter(item => item !== id);
-  localStorage.setItem("watchlist", JSON.stringify(list));
-  alert("🗑️ Removed from watchlist");
-  location.reload();
-}
-
-// ========================
-// SEARCH PAGE - COMPLETE WORKING CODE
-// ========================
-const searchInput = document.getElementById("searchInput");
-const searchResults = document.getElementById("searchResults");
-
-if (searchInput && searchResults) {
-  
-  // Read genre parameter from URL and auto-filter
-  const urlParams = new URLSearchParams(window.location.search);
-  const genreParam = urlParams.get('genre');
-  
-  if (genreParam) {
-    console.log('Auto-filtering by genre from URL:', genreParam);
-    
-    // Update active state
-    document.querySelectorAll('.genre-list a').forEach(link => {
-      link.classList.remove('active');
-      if (link.href.includes('genre=' + genreParam)) {
-        link.classList.add('active');
-      }
-    });
-    
-    let filteredMovies = moviesDatabase;
-    
-    if (genreParam !== 'all') {
-      filteredMovies = moviesDatabase.filter(movie => {
-        const movieGenres = movie.genre.toLowerCase();
-        return movieGenres.includes(genreParam.toLowerCase());
-      });
-    }
-    
-    // Display filtered movies
-    displaySearchResults(filteredMovies);
-  }
-  
-  function displaySearchResults(movies) {
-    if (movies.length === 0) {
-      searchResults.innerHTML = '<p style="color:#888; text-align:center; padding:50px; font-size:1.2rem;">✨ No movies found. Try another title.</p>';
-      return;
-    }
-    
-    // Show all movies
-    searchResults.innerHTML = movies.map(movie => {
-      // تحديد المسار الصحيح للصورة (لأن search.html في مجلد pages)
-      let posterPath = "../" + movie.poster;
-      return `
-        <div class="card" onclick="window.location.href='details.html?id=${movie.id}'" style="cursor: pointer;">
-          <img src="${posterPath}" alt="${movie.title}" onerror="this.src='https://via.placeholder.com/300x450?text=No+Image'">
-          <h3>${movie.title}</h3>
-          <p>⭐ ${movie.rating}</p>
-          <p style="color:#aaa; font-size:0.75rem;">${movie.year} • ${movie.genre}</p>
-          <button onclick="event.stopPropagation(); addToWatchlist(${movie.id})">Add</button>
-        </div>
-      `;
-    }).join('');
-  }
-
-  // البحث المباشر عند الكتابة (يدعم العربية والإنجليزية)
-  function performSearch() {
-    const query = searchInput.value.toLowerCase().trim();
-    if (query === "") {
-      displaySearchResults(moviesDatabase);
-    } else {
-      const filtered = moviesDatabase.filter(movie => 
-        movie.title.toLowerCase().includes(query) ||
-        movie.genre.toLowerCase().includes(query) ||
-        (movie.director && movie.director.toLowerCase().includes(query))
-      );
-      displaySearchResults(filtered);
-    }
-  }
-
-  searchInput.addEventListener("input", performSearch);
-  searchInput.addEventListener("keyup", performSearch);
-  
-  // عرض كل الأفلام عند تحميل الصفحة
-  displaySearchResults(moviesDatabase);
-  
-  // إضافة رسالة ترحيب في console
-  console.log("🔍 Search page loaded with " + moviesDatabase.length + " movies");
-}
-
-// Genre filtering for search page
-window.filterSearchByGenre = function(genre, ev) {
-  try {
-    console.log('Filtering search by genre:', genre);
-    
-    // Prevent default link behavior
-    if (ev && typeof ev.preventDefault === "function") {
-      ev.preventDefault();
-    }
-    
-    // Update active state
-    document.querySelectorAll('.genre-list a').forEach(link => {
-      link.classList.remove('active');
-    });
-    if (ev && ev.target) {
-      ev.target.classList.add('active');
-    }
-    
-    const g = String(genre || "all").toLowerCase();
-    let filteredMovies = moviesDatabase;
-
-    // Search page: "All Movies" = movies only (to match label)
-    if (g === "all") {
-      filteredMovies = moviesDatabase.filter(m => (m.mediaType || "").toLowerCase() === "movie");
-    } else if (g === "series") {
-      filteredMovies = moviesDatabase.filter(m => (m.mediaType || "").toLowerCase() === "series");
-    } else {
-      filteredMovies = moviesDatabase.filter(movie => {
-        const movieGenres = String(movie.genre || "").toLowerCase();
-        const isMatch = movieGenres.includes(g);
-        console.log('Movie:', movie.title, 'Genre:', movie.genre, 'Match:', isMatch);
-        return isMatch;
-      });
-    }
-    
-    console.log('Filtered search movies count:', filteredMovies.length);
-    
-    // Show all movies
-    const searchResults = document.getElementById("searchResults");
-    if (!searchResults) return;
-    
-    if (filteredMovies.length === 0) {
-      searchResults.innerHTML = '<p style="color:#888; text-align:center; padding:50px; font-size:1.2rem;">✨ No movies found in this genre.</p>';
-      return;
-    }
-    
-    searchResults.innerHTML = filteredMovies.map(movie => {
-      let posterPath = "../" + movie.poster;
-      return `
-        <div class="card" onclick="window.location.href='details.html?id=${movie.id}'" style="cursor: pointer;">
-          <img src="${posterPath}" alt="${movie.title}" onerror="this.src='https://via.placeholder.com/300x450?text=No+Image'">
-          <h3>${movie.title}</h3>
-          <p>⭐ ${movie.rating}</p>
-          <p style="color:#aaa; font-size:0.75rem;">${movie.year} • ${movie.genre}</p>
-          <button onclick="event.stopPropagation(); addToWatchlist(${movie.id})">Add</button>
-        </div>
-      `;
-    }).join('');
-    
-  } catch (error) {
-    console.error('Error in filterSearchByGenre:', error);
-  }
-};
-
-// ========================
-// HELPER FUNCTIONS
-// ========================
-function escapeHtml(str) {
-  if (str == null) return "";
-  const div = document.createElement("div");
-  div.textContent = str;
-  return div.innerHTML;
-}
-
-// ========================
-// REVIEWS (localStorage)
-// ========================
-const REVIEWS_KEY = "movieReviews";
-const reviewForm = document.getElementById("reviewForm");
-const reviewsList = document.getElementById("reviewsList");
-const reviewSearchInput = document.getElementById("reviewSearch");
-const movieNameInput = document.getElementById("movieName");
-const movieNameSuggestions = document.getElementById("movieNameSuggestions");
-
-function ratingStarsHtml(n) {
-  const rating = Math.min(5, Math.max(1, Number(n)));
-  const filled = "★".repeat(rating);
-  const empty = "☆".repeat(5 - rating);
-  return `<span class="stars">${filled}${empty}</span>`;
-}
-
-function normalizeText(s) {
-  return String(s || "").toLowerCase().trim();
-}
-
-function loadReviews(filterMovieQuery = "") {
-  if (!reviewsList) return;
-  const reviews = JSON.parse(localStorage.getItem(REVIEWS_KEY)) || [];
-  const q = normalizeText(filterMovieQuery);
-  const filtered = q
-    ? reviews.filter(r => normalizeText(r.movie).includes(q))
-    : reviews;
-
-  if (filtered.length === 0) {
-    reviewsList.innerHTML = `<p style="color:#888;">No reviews yet.</p>`;
-    return;
-  }
-  reviewsList.innerHTML = filtered.map(r => `
-    <article class="card card-wide">
-      <h3>${escapeHtml(r.movie)}</h3>
-      ${ratingStarsHtml(r.rating)}
-      <p class="review-body">${escapeHtml(r.text)}</p>
-    </article>
-  `).join("");
-}
-
-if (reviewForm && reviewsList) {
-  loadReviews();
-
-  // Autocomplete for movie name (from moviesDatabase)
-  if (movieNameSuggestions && Array.isArray(moviesDatabase)) {
-    const titles = [...new Set(moviesDatabase.map(m => m && m.title).filter(Boolean))]
-      .sort((a, b) => a.localeCompare(b));
-    movieNameSuggestions.innerHTML = titles
-      .map(t => `<option value="${escapeHtml(t)}"></option>`)
-      .join("");
-  }
-
-  // Search reviews by movie name
-  if (reviewSearchInput) {
-    reviewSearchInput.addEventListener("input", () => {
-      loadReviews(reviewSearchInput.value);
-    });
-  }
-
-  reviewForm.addEventListener("submit", e => {
-    e.preventDefault();
-    const movie = document.getElementById("movieName").value.trim();
-    const rating = parseInt(document.getElementById("rating").value, 10);
-    const text = document.getElementById("reviewText").value.trim();
-    if (!movie || !text || rating < 1 || rating > 5) return;
-
-    const reviews = JSON.parse(localStorage.getItem(REVIEWS_KEY)) || [];
-    reviews.unshift({ movie, rating, text });
-    localStorage.setItem(REVIEWS_KEY, JSON.stringify(reviews));
-    reviewForm.reset();
-    if (reviewSearchInput) reviewSearchInput.value = "";
-    loadReviews();
-  });
-}
-
-// ========================
-// FORUM (localStorage)
-// ========================
-const FORUM_KEY = "forumPosts";
-const forumNewPostForm = document.getElementById("forumNewPostForm");
-const forumPostsEl = document.getElementById("forumPosts");
-
-function getForumPosts() {
-  try {
-    return JSON.parse(localStorage.getItem(FORUM_KEY)) || [];
-  } catch {
-    return [];
-  }
-}
-
-function saveForumPosts(posts) {
-  localStorage.setItem(FORUM_KEY, JSON.stringify(posts));
-}
-
-function newPostId() {
-  return (typeof crypto !== "undefined" && crypto.randomUUID && crypto.randomUUID()) ||
-    String(Date.now()) + "-" + Math.random().toString(16).slice(2);
-}
-
-function renderForumPosts() {
-  if (!forumPostsEl) return;
-  let posts = getForumPosts();
-  posts = posts.slice().sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-
-  if (posts.length === 0) {
-    forumPostsEl.innerHTML = `<p style="color:#888;">No posts yet.</p>`;
-    return;
-  }
-
-  forumPostsEl.innerHTML = posts.map(post => {
-    const comments = post.comments || [];
-    const commentsHtml = comments.length ? comments.map(c => `
-      <div class="comment-item">
-        <div class="who">${escapeHtml(c.author || "Guest")}</div>
-        <div>${escapeHtml(c.text)}</div>
-      </div>
-    `).join("") : `<p style="color:#666;">No comments yet.</p>`;
-
-    return `
-      <article class="card card-wide forum-post" data-post-id="${escapeHtml(post.id)}">
-        <h3>${escapeHtml(post.title)}</h3>
-        <p class="post-meta">By ${escapeHtml(post.author || "Guest")}</p>
-        <p class="post-body">${escapeHtml(post.body)}</p>
-        <div class="comments-block">
-          <h4>Comments</h4>
-          ${commentsHtml}
-          <form class="comment-form" data-post-id="${escapeHtml(post.id)}">
-            <input type="text" class="comment-author" placeholder="Your name (optional)" style="width:100%; margin-bottom:8px; padding:8px; border-radius:8px; background:#1a1a1a; color:white; border:1px solid #333;">
-            <textarea class="comment-text" placeholder="Write a comment…" rows="2" style="width:100%; padding:8px; border-radius:8px; background:#1a1a1a; color:white; border:1px solid #333;"></textarea>
-            <button type="submit" style="margin-top:8px;">Add comment</button>
-          </form>
-        </div>
-      </article>
-    `;
-  }).join("");
-}
-
-if (forumPostsEl) {
-  renderForumPosts();
-  forumPostsEl.addEventListener("submit", e => {
-    const form = e.target.closest(".comment-form");
-    if (!form || !forumPostsEl.contains(form)) return;
-    e.preventDefault();
-    const postId = form.getAttribute("data-post-id");
-    const author = form.querySelector(".comment-author").value.trim() || "Guest";
-    const text = form.querySelector(".comment-text").value.trim();
-    if (!text || !postId) return;
-
-    const posts = getForumPosts();
-    const idx = posts.findIndex(p => String(p.id) === String(postId));
-    if (idx === -1) return;
-    if (!posts[idx].comments) posts[idx].comments = [];
-    posts[idx].comments.push({ author, text });
-    saveForumPosts(posts);
-    renderForumPosts();
-  });
-}
-
-if (forumNewPostForm) {
-  forumNewPostForm.addEventListener("submit", e => {
-    e.preventDefault();
-    const title = document.getElementById("postTitle").value.trim();
-    const author = document.getElementById("postAuthor").value.trim() || "Guest";
-    const body = document.getElementById("postBody").value.trim();
-    if (!title || !body) return;
-
-    const posts = getForumPosts();
-    posts.push({
-      id: newPostId(),
-      createdAt: Date.now(),
-      title,
-      author,
-      body,
-      comments: []
-    });
-    saveForumPosts(posts);
-    forumNewPostForm.reset();
-    renderForumPosts();
-  });
-}
-// ========================
-// FEATURED TODAY SECTION
+// HOME PAGE — featured slider, celebrities, recommendations, top 10, interests
 // ========================
 function loadFeaturedToday() {
   const featuredContainer = document.getElementById("featuredSlider");
@@ -1517,4 +1211,303 @@ if (document.getElementById("top10List")) {
 }
 if (document.getElementById("interestsGrid")) {
   loadPopularInterests();
+}
+
+// ========================
+// WATCHLIST (pages/watchlist.html)
+// ========================
+function addToWatchlist(id) {
+  let list = JSON.parse(localStorage.getItem("watchlist")) || [];
+  if (!list.includes(id)) {
+    list.push(id);
+    localStorage.setItem("watchlist", JSON.stringify(list));
+    alert("✅ Added to watchlist!");
+  } else {
+    alert("⚠️ Already in watchlist");
+  }
+}
+
+const watchDiv = document.getElementById("watchlist");
+let allWatchlistMovies = []; // Store all watchlist movies for filtering
+
+if (watchDiv) {
+  let list = JSON.parse(localStorage.getItem("watchlist")) || [];
+  if (list.length === 0) {
+    watchDiv.innerHTML = `
+      <div class="empty-watchlist">
+        <h2>📭 Your watchlist is empty</h2>
+        <p>Start adding movies and shows you want to watch later!</p>
+        <a href="search.html">Browse Movies</a>
+      </div>
+    `;
+  } else {
+    // Get all movies in watchlist
+    allWatchlistMovies = list.map(id => moviesDatabase.find(m => m.id === id)).filter(m => m);
+    displayWatchlistMovies(allWatchlistMovies);
+  }
+}
+
+function displayWatchlistMovies(movies) {
+  if (!watchDiv) return;
+  
+  if (movies.length === 0) {
+    watchDiv.innerHTML = `
+      <div class="empty-watchlist">
+        <h2>📭 No movies found</h2>
+        <p>Try selecting a different genre</p>
+        <a href="search.html">Browse Movies</a>
+      </div>
+    `;
+    return;
+  }
+  
+  watchDiv.innerHTML = `<div class="watchlist-grid">`;
+  movies.forEach(movie => {
+    watchDiv.innerHTML += `
+      <div class="watchlist-item">
+        <img src="../${movie.poster}" alt="${movie.title}" onerror="this.src='https://via.placeholder.com/250x350?text=No+Image'">
+        <div class="watchlist-info">
+          <h3>${movie.title}</h3>
+          <p>⭐ ${movie.rating}</p>
+          <p style="color:#aaa; font-size:0.8rem;">${movie.year} • ${movie.genre}</p>
+          <div class="watchlist-actions">
+            <button class="btn-view" onclick="window.location.href='details.html?id=${movie.id}'">View Details</button>
+            <button class="btn-remove" onclick="removeFromWatchlist(${movie.id})">Remove</button>
+          </div>
+        </div>
+      </div>
+    `;
+  });
+  watchDiv.innerHTML += `</div>`;
+}
+
+// Genre/type filtering for watchlist page
+window.filterWatchlistByGenre = function(genre, ev) {
+  console.log('Filtering watchlist by genre:', genre);
+
+  if (ev && typeof ev.preventDefault === "function") ev.preventDefault();
+
+  // Update active state
+  document.querySelectorAll('.genre-list a').forEach(link => {
+    link.classList.remove('active');
+  });
+  if (ev && ev.target) ev.target.classList.add('active');
+
+  const g = String(genre || "all").toLowerCase();
+  let filteredMovies = allWatchlistMovies;
+
+  if (g === "series") {
+    filteredMovies = allWatchlistMovies.filter(m => (m.mediaType || "").toLowerCase() === "series");
+  } else if (g !== "all") {
+    filteredMovies = allWatchlistMovies.filter(movie => {
+      const movieGenres = String(movie.genre || "").toLowerCase();
+      return movieGenres.includes(g);
+    });
+  }
+
+  // Update header title
+  const header = document.querySelector('.watchlist-header h1');
+  if (header) {
+    if (g === 'all') {
+      header.textContent = '📋 My Watchlist';
+    } else if (g === "series") {
+      header.textContent = '📺 My Watchlist (Series)';
+    } else {
+      const genreName = g.charAt(0).toUpperCase() + g.slice(1);
+      header.textContent = `📋 ${genreName}`;
+    }
+  }
+
+  displayWatchlistMovies(filteredMovies);
+};
+
+function removeFromWatchlist(id) {
+  let list = JSON.parse(localStorage.getItem("watchlist")) || [];
+  list = list.filter(item => item !== id);
+  localStorage.setItem("watchlist", JSON.stringify(list));
+  alert("🗑️ Removed from watchlist");
+  location.reload();
+}
+
+// ========================
+// REVIEWS & REVIEW FORM (forum.html — reviews section)
+// ========================
+const REVIEWS_KEY = "movieReviews";
+const reviewForm = document.getElementById("reviewForm");
+const reviewsList = document.getElementById("reviewsList");
+const reviewSearchInput = document.getElementById("reviewSearch");
+const movieNameInput = document.getElementById("movieName");
+const movieNameSuggestions = document.getElementById("movieNameSuggestions");
+
+function ratingStarsHtml(n) {
+  const rating = Math.min(5, Math.max(1, Number(n)));
+  const filled = "★".repeat(rating);
+  const empty = "☆".repeat(5 - rating);
+  return `<span class="stars">${filled}${empty}</span>`;
+}
+
+function normalizeText(s) {
+  return String(s || "").toLowerCase().trim();
+}
+
+function loadReviews(filterMovieQuery = "") {
+  if (!reviewsList) return;
+  const reviews = JSON.parse(localStorage.getItem(REVIEWS_KEY)) || [];
+  const q = normalizeText(filterMovieQuery);
+  const filtered = q
+    ? reviews.filter(r => normalizeText(r.movie).includes(q))
+    : reviews;
+
+  if (filtered.length === 0) {
+    reviewsList.innerHTML = `<p style="color:#888;">No reviews yet.</p>`;
+    return;
+  }
+  reviewsList.innerHTML = filtered.map(r => `
+    <article class="card card-wide">
+      <h3>${escapeHtml(r.movie)}</h3>
+      ${ratingStarsHtml(r.rating)}
+      <p class="review-body">${escapeHtml(r.text)}</p>
+    </article>
+  `).join("");
+}
+
+if (reviewForm && reviewsList) {
+  loadReviews();
+
+  // Autocomplete for movie name (from moviesDatabase)
+  if (movieNameSuggestions && Array.isArray(moviesDatabase)) {
+    const titles = [...new Set(moviesDatabase.map(m => m && m.title).filter(Boolean))]
+      .sort((a, b) => a.localeCompare(b));
+    movieNameSuggestions.innerHTML = titles
+      .map(t => `<option value="${escapeHtml(t)}"></option>`)
+      .join("");
+  }
+
+  // Search reviews by movie name
+  if (reviewSearchInput) {
+    reviewSearchInput.addEventListener("input", () => {
+      loadReviews(reviewSearchInput.value);
+    });
+  }
+
+  reviewForm.addEventListener("submit", e => {
+    e.preventDefault();
+    const movie = document.getElementById("movieName").value.trim();
+    const rating = parseInt(document.getElementById("rating").value, 10);
+    const text = document.getElementById("reviewText").value.trim();
+    if (!movie || !text || rating < 1 || rating > 5) return;
+
+    const reviews = JSON.parse(localStorage.getItem(REVIEWS_KEY)) || [];
+    reviews.unshift({ movie, rating, text });
+    localStorage.setItem(REVIEWS_KEY, JSON.stringify(reviews));
+    reviewForm.reset();
+    if (reviewSearchInput) reviewSearchInput.value = "";
+    loadReviews();
+  });
+}
+
+// ========================
+// FORUM (forum.html — discussion board)
+// ========================
+const FORUM_KEY = "forumPosts";
+const forumNewPostForm = document.getElementById("forumNewPostForm");
+const forumPostsEl = document.getElementById("forumPosts");
+
+function getForumPosts() {
+  try {
+    return JSON.parse(localStorage.getItem(FORUM_KEY)) || [];
+  } catch {
+    return [];
+  }
+}
+
+function saveForumPosts(posts) {
+  localStorage.setItem(FORUM_KEY, JSON.stringify(posts));
+}
+
+function newPostId() {
+  return (typeof crypto !== "undefined" && crypto.randomUUID && crypto.randomUUID()) ||
+    String(Date.now()) + "-" + Math.random().toString(16).slice(2);
+}
+
+function renderForumPosts() {
+  if (!forumPostsEl) return;
+  let posts = getForumPosts();
+  posts = posts.slice().sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+  if (posts.length === 0) {
+    forumPostsEl.innerHTML = `<p style="color:#888;">No posts yet.</p>`;
+    return;
+  }
+
+  forumPostsEl.innerHTML = posts.map(post => {
+    const comments = post.comments || [];
+    const commentsHtml = comments.length ? comments.map(c => `
+      <div class="comment-item">
+        <div class="who">${escapeHtml(c.author || "Guest")}</div>
+        <div>${escapeHtml(c.text)}</div>
+      </div>
+    `).join("") : `<p style="color:#666;">No comments yet.</p>`;
+
+    return `
+      <article class="card card-wide forum-post" data-post-id="${escapeHtml(post.id)}">
+        <h3>${escapeHtml(post.title)}</h3>
+        <p class="post-meta">By ${escapeHtml(post.author || "Guest")}</p>
+        <p class="post-body">${escapeHtml(post.body)}</p>
+        <div class="comments-block">
+          <h4>Comments</h4>
+          ${commentsHtml}
+          <form class="comment-form" data-post-id="${escapeHtml(post.id)}">
+            <input type="text" class="comment-author" placeholder="Your name (optional)" style="width:100%; margin-bottom:8px; padding:8px; border-radius:8px; background:#1a1a1a; color:white; border:1px solid #333;">
+            <textarea class="comment-text" placeholder="Write a comment…" rows="2" style="width:100%; padding:8px; border-radius:8px; background:#1a1a1a; color:white; border:1px solid #333;"></textarea>
+            <button type="submit" style="margin-top:8px;">Add comment</button>
+          </form>
+        </div>
+      </article>
+    `;
+  }).join("");
+}
+
+if (forumPostsEl) {
+  renderForumPosts();
+  forumPostsEl.addEventListener("submit", e => {
+    const form = e.target.closest(".comment-form");
+    if (!form || !forumPostsEl.contains(form)) return;
+    e.preventDefault();
+    const postId = form.getAttribute("data-post-id");
+    const author = form.querySelector(".comment-author").value.trim() || "Guest";
+    const text = form.querySelector(".comment-text").value.trim();
+    if (!text || !postId) return;
+
+    const posts = getForumPosts();
+    const idx = posts.findIndex(p => String(p.id) === String(postId));
+    if (idx === -1) return;
+    if (!posts[idx].comments) posts[idx].comments = [];
+    posts[idx].comments.push({ author, text });
+    saveForumPosts(posts);
+    renderForumPosts();
+  });
+}
+
+if (forumNewPostForm) {
+  forumNewPostForm.addEventListener("submit", e => {
+    e.preventDefault();
+    const title = document.getElementById("postTitle").value.trim();
+    const author = document.getElementById("postAuthor").value.trim() || "Guest";
+    const body = document.getElementById("postBody").value.trim();
+    if (!title || !body) return;
+
+    const posts = getForumPosts();
+    posts.push({
+      id: newPostId(),
+      createdAt: Date.now(),
+      title,
+      author,
+      body,
+      comments: []
+    });
+    saveForumPosts(posts);
+    forumNewPostForm.reset();
+    renderForumPosts();
+  });
 }

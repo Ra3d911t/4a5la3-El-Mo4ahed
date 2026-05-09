@@ -35,11 +35,19 @@
   </div>
 
   <div class="admin-panel" id="adminPanel">
-    
+    <p style="color:#8f8;">Session active in this browser.</p>
+    <button type="button" id="adminLogout" style="margin-bottom:24px;padding:8px 16px;border-radius:8px;cursor:pointer;">Lock panel</button>
+
     <!-- Movies -->
     <section class="admin-section">
       <h2>Movies &amp; series (<span id="movieCount">0</span>)</h2>
-     </div>
+      <p style="color:#888;font-size:14px;">Add, edit, or remove catalog titles. “Copy bundled catalog” saves the default list to storage so edits apply across every page.</p>
+      <div class="admin-toolbar">
+        <button type="button" id="btnSeedCatalog">Copy bundled catalog to storage</button>
+        <button type="button" id="btnResetCatalog" class="danger">Remove custom catalog (revert to code defaults)</button>
+        <button type="button" id="btnExportJson">Show / copy JSON</button>
+        <label class="file-btn">Import JSON<input type="file" id="importJsonFile" accept="application/json,.json"></label>
+      </div>
       <textarea id="exportJsonArea" placeholder="Click “Show / copy JSON” to fill export…" readonly></textarea>
 
       <h3 style="margin-top:24px;font-size:1rem;color:#f5c518;">Title editor</h3>

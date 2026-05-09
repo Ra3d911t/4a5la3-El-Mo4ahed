@@ -134,6 +134,82 @@
   </div>
 </main>
 
+<!-- Edit Modal -->
+<div id="editModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Edit Movie</h2>
+      <span class="close-modal">&times;</span>
+    </div>
+    <div class="modal-body">
+      <form id="editMovieForm">
+        <input type="hidden" id="modalEditMovieId" value="">
+        <label>Title
+          <input type="text" id="modal_m_title" required placeholder="Inception">
+        </label>
+        <label>Rating (/10)
+          <input type="number" id="modal_m_rating" step="0.1" min="0" max="10" required value="7">
+        </label>
+        <label>Release year
+          <input type="number" id="modal_m_year" min="1888" max="2100" required value="2024">
+        </label>
+        <label>Type
+          <select id="modal_m_mediaType">
+            <option value="movie">Movie</option>
+            <option value="series">TV series</option>
+          </select>
+        </label>
+        <label>Region
+          <select id="modal_m_region">
+            <option value="foreign">International</option>
+            <option value="arabic">Arabic cinema</option>
+          </select>
+        </label>
+        <label>Poster path
+          <input type="text" id="modal_m_poster" required placeholder="images/my-poster.jpg">
+        </label>
+        <label>Genres (comma-separated)
+          <input type="text" id="modal_m_genre" required placeholder="Action, Sci-Fi">
+        </label>
+        <label>Director
+          <input type="text" id="modal_m_director" required placeholder="Director name">
+        </label>
+        <label>Cast (comma-separated)
+          <textarea id="modal_m_cast" rows="2" placeholder="Actor A, Actor B"></textarea>
+        </label>
+        <label>Description
+          <textarea id="modal_m_description" rows="4" required placeholder="Plot summary…"></textarea>
+        </label>
+        <label>YouTube trailer ID (optional)
+          <input type="text" id="modal_m_trailer" placeholder="e.g. YoHD9XAuDmE">
+        </label>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="cancel-modal">Cancel</button>
+      <button type="button" id="saveEditBtn" class="primary">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Modal -->
+<div id="deleteModal" class="modal">
+  <div class="modal-content modal-small">
+    <div class="modal-header">
+      <h2>Delete Movie</h2>
+      <span class="close-modal">&times;</span>
+    </div>
+    <div class="modal-body">
+      <p>Are you sure you want to delete <strong id="deleteMovieTitle"></strong>?</p>
+      <p style="color: #ff6b6b;">This action cannot be undone.</p>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="cancel-modal">Cancel</button>
+      <button type="button" id="confirmDeleteBtn" class="danger">Delete</button>
+    </div>
+  </div>
+</div>
+
 <footer>
   <p>© 2026 Movie cave</p>
 </footer>
@@ -152,6 +228,41 @@
   const msg = document.getElementById('adminLoginMsg');
 
   let editingNumericId = null;
+  let deleteMovieId = null;
+
+  // Modal functions
+  function openModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+      modal.classList.add('show');
+      modal.style.display = 'flex';
+    }
+  }
+
+  function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+      modal.classList.remove('show');
+      modal.style.display = 'none';
+    }
+  }
+
+  function closeAllModals() {
+    closeModal('editModal');
+    closeModal('deleteModal');
+  }
+
+  // Close modals when clicking outside
+  window.addEventListener('click', function(e) {
+    if (e.target.classList.contains('modal')) {
+      closeAllModals();
+    }
+  });
+
+  // Close modal buttons
+  document.querySelectorAll('.close-modal, .cancel-modal').forEach(function(btn) {
+    btn.addEventListener('click', closeAllModals);
+  });
 
   function esc(s) {
     if (s == null) return '';
@@ -283,6 +394,57 @@
     document.getElementById('m_description').value = m.description;
     document.getElementById('m_trailer').value = m.trailerYoutubeId || '';
     document.getElementById('movieEditorForm').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function fillEditModal(m) {
+    var nid = parseInt(m.id, 10);
+    editingNumericId = Number.isNaN(nid) ? null : nid;
+    document.getElementById('modalEditMovieId').value = String(m.id);
+    document.getElementById('modal_m_title').value = m.title;
+    document.getElementById('modal_m_rating').value = m.rating;
+    document.getElementById('modal_m_year').value = m.year;
+    document.getElementById('modal_m_mediaType').value = (m.mediaType || 'movie').toLowerCase() === 'series' ? 'series' : 'movie';
+    document.getElementById('modal_m_region').value = (m.region || 'foreign').toLowerCase() === 'arabic' ? 'arabic' : 'foreign';
+    document.getElementById('modal_m_poster').value = m.poster;
+    document.getElementById('modal_m_genre').value = m.genre;
+    document.getElementById('modal_m_director').value = m.director;
+    document.getElementById('modal_m_cast').value = (m.cast || []).join(', ');
+    document.getElementById('modal_m_description').value = m.description;
+    document.getElementById('modal_m_trailer').value = m.trailerYoutubeId || '';
+    openModal('editModal');
+  }
+
+  function saveFromModal() {
+    if (!isAuthed()) return;
+    var list = getCatalog();
+    var trailerVal = document.getElementById('modal_m_trailer').value.trim();
+    var prev = editingNumericId != null ? list.find(function (m) { return Number(m.id) === Number(editingNumericId); }) : null;
+    var obj = {
+      id: editingNumericId != null ? editingNumericId : nextMovieId(list),
+      title: document.getElementById('modal_m_title').value.trim(),
+      rating: document.getElementById('modal_m_rating').value,
+      year: document.getElementById('modal_m_year').value,
+      poster: document.getElementById('modal_m_poster').value.trim(),
+      genre: document.getElementById('modal_m_genre').value.trim(),
+      director: document.getElementById('modal_m_director').value.trim(),
+      cast: parseCast(document.getElementById('modal_m_cast').value),
+      description: document.getElementById('modal_m_description').value.trim(),
+      mediaType: document.getElementById('modal_m_mediaType').value,
+      region: document.getElementById('modal_m_region').value,
+      reviews: prev && Array.isArray(prev.reviews) ? prev.reviews.slice() : []
+    };
+    if (trailerVal) obj.trailerYoutubeId = trailerVal;
+    var out;
+    if (editingNumericId != null) {
+      out = list.map(function (m) { return Number(m.id) === Number(editingNumericId) ? normalizeMovie(obj) : m; });
+    } else {
+      out = list.concat([normalizeMovie(obj)]);
+    }
+    saveCatalog(out);
+    closeAllModals();
+    clearMovieForm();
+    renderMovieAdminList();
+    alert('Title saved.');
   }
 
   function clearMovieForm() {
@@ -453,13 +615,27 @@
     var list = getCatalog();
     var m = list.find(function (x) { return Number(x.id) === id; });
     if (!m) return;
-    if (e.target.classList.contains('btn-edit-movie')) fillMovieForm(m);
+    if (e.target.classList.contains('btn-edit-movie')) fillEditModal(m);
     if (e.target.classList.contains('btn-del-movie')) {
-      if (!confirm('Delete “' + m.title + '”?')) return;
-      saveCatalog(list.filter(function (x) { return Number(x.id) !== id; }));
-      if (Number(editingNumericId) === id) clearMovieForm();
-      renderMovieAdminList();
+      deleteMovieId = id;
+      document.getElementById('deleteMovieTitle').textContent = m.title;
+      openModal('deleteModal');
     }
+  });
+
+  // Save button in edit modal
+  document.getElementById('saveEditBtn').addEventListener('click', saveFromModal);
+
+  // Confirm delete button
+  document.getElementById('confirmDeleteBtn').addEventListener('click', function () {
+    if (!isAuthed() || deleteMovieId == null) return;
+    var list = getCatalog();
+    saveCatalog(list.filter(function (x) { return Number(x.id) !== deleteMovieId; }));
+    if (Number(editingNumericId) === deleteMovieId) clearMovieForm();
+    deleteMovieId = null;
+    closeAllModals();
+    renderMovieAdminList();
+    alert('Movie deleted.');
   });
 
   document.getElementById('adminReviews').addEventListener('click', function (e) {

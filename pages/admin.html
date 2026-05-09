@@ -160,6 +160,18 @@
     return d.innerHTML;
   }
 
+  function safeJsonParse(key, fallback) {
+    try {
+      const raw = localStorage.getItem(key);
+      if (raw == null || raw === '') return fallback;
+      const v = JSON.parse(raw);
+      return v == null ? fallback : v;
+    } catch (e) {
+      console.warn('admin: bad JSON for', key, e);
+      return fallback;
+    }
+  }
+
   function isAuthed() {
     return sessionStorage.getItem(SESSION_KEY) === '1';
   }
@@ -188,8 +200,11 @@
   function normalizeMovie(raw) {
     const m = Object.assign({}, raw);
     m.id = parseInt(m.id, 10);
+    if (Number.isNaN(m.id)) m.id = 0;
     m.rating = parseFloat(m.rating);
+    if (Number.isNaN(m.rating)) m.rating = 0;
     m.year = parseInt(m.year, 10);
+    if (Number.isNaN(m.year)) m.year = new Date().getFullYear();
     if (!Array.isArray(m.cast)) m.cast = parseCast(m.cast || '');
     if (!m.reviews) m.reviews = [];
     if (!m.mediaType) m.mediaType = 'movie';
@@ -205,27 +220,38 @@
   }
 
   function getCatalog() {
-    return typeof getMoviesDb === 'function' ? getMoviesDb().slice() : [];
+    if (typeof getMoviesDb !== 'function') return [];
+    var db = getMoviesDb();
+    return Array.isArray(db) ? db.slice() : [];
   }
 
   function saveCatalog(arr) {
-    const cleaned = arr.map(function (m) { return normalizeMovie(m); });
-    if (typeof saveMoviesCatalogToStorage === 'function') {
+    try {
+      var cleaned = arr.map(function (m) { return normalizeMovie(m); });
+      if (typeof saveMoviesCatalogToStorage !== 'function') {
+        alert('Save failed: catalog API missing. Reload the page.');
+        return;
+      }
       saveMoviesCatalogToStorage(cleaned);
+    } catch (e) {
+      console.error(e);
+      alert('Could not save catalog.');
     }
   }
 
   function renderMovieAdminList() {
-    const el = document.getElementById('movieListAdmin');
-    const q = (document.getElementById('movieAdminFilter') || {}).value || '';
-    const ql = q.toLowerCase().trim();
-    let list = getCatalog();
+    var el = document.getElementById('movieListAdmin');
+    if (!el) return;
+    var q = (document.getElementById('movieAdminFilter') || {}).value || '';
+    var ql = q.toLowerCase().trim();
+    var list = getCatalog();
     if (ql) {
       list = list.filter(function (m) {
         return String(m.title).toLowerCase().includes(ql) || String(m.genre).toLowerCase().includes(ql);
       });
     }
-    document.getElementById('movieCount').textContent = String(getCatalog().length);
+    var cnt = document.getElementById('movieCount');
+    if (cnt) cnt.textContent = String(getCatalog().length);
     if (!list.length) {
       el.innerHTML = '<p style="color:#888;">No results.</p>';
       return;
@@ -242,7 +268,8 @@
   }
 
   function fillMovieForm(m) {
-    editingNumericId = m.id;
+    var nid = parseInt(m.id, 10);
+    editingNumericId = Number.isNaN(nid) ? null : nid;
     document.getElementById('editMovieId').value = String(m.id);
     document.getElementById('m_title').value = m.title;
     document.getElementById('m_rating').value = m.rating;
@@ -267,9 +294,12 @@
   }
 
   function renderReviews() {
-    const el = document.getElementById('adminReviews');
-    const reviews = JSON.parse(localStorage.getItem(REVIEWS_KEY) || '[]');
-    document.getElementById('reviewCount').textContent = String(reviews.length);
+    var el = document.getElementById('adminReviews');
+    if (!el) return;
+    var reviews = safeJsonParse(REVIEWS_KEY, []);
+    if (!Array.isArray(reviews)) reviews = [];
+    var rc = document.getElementById('reviewCount');
+    if (rc) rc.textContent = String(reviews.length);
     if (!reviews.length) {
       el.innerHTML = '<p style="color:#888;">No reviews.</p>';
       return;
@@ -280,9 +310,12 @@
   }
 
   function renderForum() {
-    const el = document.getElementById('adminForum');
-    const posts = JSON.parse(localStorage.getItem(FORUM_KEY) || '[]');
-    document.getElementById('forumCount').textContent = String(posts.length);
+    var el = document.getElementById('adminForum');
+    if (!el) return;
+    var posts = safeJsonParse(FORUM_KEY, []);
+    if (!Array.isArray(posts)) posts = [];
+    var fc = document.getElementById('forumCount');
+    if (fc) fc.textContent = String(posts.length);
     if (!posts.length) {
       el.innerHTML = '<p style="color:#888;">No posts.</p>';
       return;
@@ -293,9 +326,12 @@
   }
 
   function renderUsers() {
-    const el = document.getElementById('adminUsers');
-    const users = JSON.parse(localStorage.getItem(USERS_KEY) || '[]');
-    document.getElementById('userCount').textContent = String(users.length);
+    var el = document.getElementById('adminUsers');
+    if (!el) return;
+    var users = safeJsonParse(USERS_KEY, []);
+    if (!Array.isArray(users)) users = [];
+    var uc = document.getElementById('userCount');
+    if (uc) uc.textContent = String(users.length);
     if (!users.length) {
       el.innerHTML = '<p style="color:#888;">No registered users yet.</p>';
       return;
@@ -310,7 +346,8 @@
     renderReviews();
     renderForum();
     renderUsers();
-    document.getElementById('exportJsonArea').value = '';
+    var ex = document.getElementById('exportJsonArea');
+    if (ex) ex.value = '';
   }
 
   document.getElementById('adminLoginBtn').addEventListener('click', function () {
@@ -373,10 +410,10 @@
   document.getElementById('movieEditorForm').addEventListener('submit', function (e) {
     e.preventDefault();
     if (!isAuthed()) return;
-    const list = getCatalog();
-    const trailerVal = document.getElementById('m_trailer').value.trim();
-    const prev = editingNumericId != null ? list.find(function (m) { return m.id === editingNumericId; }) : null;
-    const obj = {
+    var list = getCatalog();
+    var trailerVal = document.getElementById('m_trailer').value.trim();
+    var prev = editingNumericId != null ? list.find(function (m) { return Number(m.id) === Number(editingNumericId); }) : null;
+    var obj = {
       id: editingNumericId != null ? editingNumericId : nextMovieId(list),
       title: document.getElementById('m_title').value.trim(),
       rating: document.getElementById('m_rating').value,
@@ -391,9 +428,9 @@
       reviews: prev && Array.isArray(prev.reviews) ? prev.reviews.slice() : []
     };
     if (trailerVal) obj.trailerYoutubeId = trailerVal;
-    let out;
+    var out;
     if (editingNumericId != null) {
-      out = list.map(function (m) { return m.id === editingNumericId ? normalizeMovie(obj) : m; });
+      out = list.map(function (m) { return Number(m.id) === Number(editingNumericId) ? normalizeMovie(obj) : m; });
     } else {
       out = list.concat([normalizeMovie(obj)]);
     }
@@ -411,24 +448,28 @@
     if (!isAuthed()) return;
     const row = e.target.closest('.movie-row');
     if (!row) return;
-    const id = parseInt(row.getAttribute('data-mid'), 10);
-    const list = getCatalog();
-    const m = list.find(function (x) { return x.id === id; });
+    var id = parseInt(row.getAttribute('data-mid'), 10);
+    if (Number.isNaN(id)) return;
+    var list = getCatalog();
+    var m = list.find(function (x) { return Number(x.id) === id; });
     if (!m) return;
     if (e.target.classList.contains('btn-edit-movie')) fillMovieForm(m);
     if (e.target.classList.contains('btn-del-movie')) {
       if (!confirm('Delete “' + m.title + '”?')) return;
-      saveCatalog(list.filter(function (x) { return x.id !== id; }));
-      if (editingNumericId === id) clearMovieForm();
+      saveCatalog(list.filter(function (x) { return Number(x.id) !== id; }));
+      if (Number(editingNumericId) === id) clearMovieForm();
       renderMovieAdminList();
     }
   });
 
   document.getElementById('adminReviews').addEventListener('click', function (e) {
     if (!isAuthed() || !e.target.classList.contains('del-review')) return;
-    const item = e.target.closest('.mod-item');
-    const i = parseInt(item.getAttribute('data-review-index'), 10);
-    let reviews = JSON.parse(localStorage.getItem(REVIEWS_KEY) || '[]');
+    var item = e.target.closest('.mod-item');
+    if (!item) return;
+    var i = parseInt(item.getAttribute('data-review-index'), 10);
+    if (Number.isNaN(i)) return;
+    var reviews = safeJsonParse(REVIEWS_KEY, []);
+    if (!Array.isArray(reviews)) reviews = [];
     reviews.splice(i, 1);
     localStorage.setItem(REVIEWS_KEY, JSON.stringify(reviews));
     renderReviews();
@@ -436,9 +477,11 @@
 
   document.getElementById('adminForum').addEventListener('click', function (e) {
     if (!isAuthed() || !e.target.classList.contains('del-post')) return;
-    const item = e.target.closest('.mod-item');
-    const id = item.getAttribute('data-post-id');
-    let posts = JSON.parse(localStorage.getItem(FORUM_KEY) || '[]');
+    var item = e.target.closest('.mod-item');
+    if (!item) return;
+    var id = item.getAttribute('data-post-id');
+    var posts = safeJsonParse(FORUM_KEY, []);
+    if (!Array.isArray(posts)) posts = [];
     posts = posts.filter(function (p) { return String(p.id) !== id; });
     localStorage.setItem(FORUM_KEY, JSON.stringify(posts));
     renderForum();
@@ -446,9 +489,12 @@
 
   document.getElementById('adminUsers').addEventListener('click', function (e) {
     if (!isAuthed() || !e.target.classList.contains('del-user')) return;
-    const item = e.target.closest('.mod-item');
-    const i = parseInt(item.getAttribute('data-user-index'), 10);
-    let users = JSON.parse(localStorage.getItem(USERS_KEY) || '[]');
+    var item = e.target.closest('.mod-item');
+    if (!item) return;
+    var i = parseInt(item.getAttribute('data-user-index'), 10);
+    if (Number.isNaN(i)) return;
+    var users = safeJsonParse(USERS_KEY, []);
+    if (!Array.isArray(users)) users = [];
     users.splice(i, 1);
     localStorage.setItem(USERS_KEY, JSON.stringify(users));
     renderUsers();

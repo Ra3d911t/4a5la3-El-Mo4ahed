@@ -35,6 +35,8 @@
   </div>
 
   <div class="admin-panel" id="adminPanel">
+    <p style="color:#8f8;">Session active in this browser.</p>
+    <button type="button" id="adminLogout" style="margin-bottom:24px;padding:8px 16px;border-radius:8px;cursor:pointer;">Lock panel</button>
 
     <!-- Movies -->
     <section class="admin-section">
@@ -512,7 +514,7 @@
 
   document.getElementById('adminLogout').addEventListener('click', hidePanel);
 
-  document.getElementById('btnSeedCatalog').addEventListener('click', function () {
+  document.getElementById('btnSeedCatalog')?.addEventListener('click', function () {
     if (!isAuthed()) return;
     if (!confirm('This will replace the stored catalog with a full copy of the bundled default list. Continue?')) return;
     const copy = typeof getBundledMoviesDefault === 'function' ? getBundledMoviesDefault() : [];
@@ -522,7 +524,7 @@
     alert('Saved. Refresh the home page to see changes.');
   });
 
-  document.getElementById('btnResetCatalog').addEventListener('click', function () {
+  document.getElementById('btnResetCatalog')?.addEventListener('click', function () {
     if (!isAuthed()) return;
     if (!confirm('Remove the custom catalog? The site will read titles from the code file only.')) return;
     if (typeof resetMoviesCatalogToBundledDefault === 'function') resetMoviesCatalogToBundledDefault();
@@ -531,12 +533,12 @@
     alert('Done. Reload other open tabs.');
   });
 
-  document.getElementById('btnExportJson').addEventListener('click', function () {
+  document.getElementById('btnExportJson')?.addEventListener('click', function () {
     if (!isAuthed()) return;
     document.getElementById('exportJsonArea').value = JSON.stringify(getCatalog(), null, 2);
   });
 
-  document.getElementById('importJsonFile').addEventListener('change', function (e) {
+  document.getElementById('importJsonFile')?.addEventListener('change', function (e) {
     if (!isAuthed()) return;
     const f = e.target.files && e.target.files[0];
     if (!f) return;

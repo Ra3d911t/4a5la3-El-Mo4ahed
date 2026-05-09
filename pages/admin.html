@@ -10,7 +10,26 @@
     .admin-panel { display: none; }
     .admin-panel.visible { display: block; }
     .mod-item { background: #1f1f1f; border: 1px solid #333; border-radius: 8px; padding: 12px; margin-bottom: 10px; }
-    .mod-item button { margin-top: 8px; }
+    .mod-item button { margin-top: 8px; margin-right: 8px; }
+    .admin-section { margin-top: 40px; padding-top: 24px; border-top: 1px solid #333; }
+    .admin-toolbar { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0; align-items: center; }
+    .admin-toolbar button, .admin-toolbar label.file-btn {
+      padding: 10px 16px; border-radius: 8px; cursor: pointer; background: #333; color: #f5c518; border: 1px solid #555; font-size: 14px;
+    }
+    .admin-toolbar button.danger { background: #4a1515; color: #faa; border-color: #633; }
+    .admin-toolbar button.primary { background: #e50914; color: #fff; border: none; font-weight: bold; }
+    .admin-toolbar label.file-btn { display: inline-block; }
+    .admin-toolbar input[type="file"] { display: none; }
+    .movie-editor-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; max-width: 900px; margin-top: 16px; }
+    .movie-editor-grid .full { grid-column: 1 / -1; }
+    .movie-editor-grid label { display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: #bbb; }
+    .movie-editor-grid input, .movie-editor-grid select, .movie-editor-grid textarea {
+      padding: 10px; border-radius: 8px; border: 1px solid #444; background: #121212; color: #fff;
+    }
+    .movie-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-start; justify-content: space-between; padding: 12px; background: #1a1a1a; border: 1px solid #333; border-radius: 8px; margin-bottom: 8px; }
+    .movie-row-meta { flex: 1; min-width: 200px; }
+    .movie-row-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+    #exportJsonArea { width: 100%; min-height: 120px; margin-top: 12px; font-family: monospace; font-size: 12px; background: #0d0d0d; color: #ccc; border: 1px solid #333; border-radius: 8px; padding: 12px; }
   </style>
 </head>
 <body>
@@ -34,25 +53,110 @@
 </nav>
 
 <main class="page-main">
-  <h1>Content moderation (demo)</h1>
-  <p style="color:#888;max-width:640px;">Class project admin panel: remove user reviews and forum posts stored in <code>localStorage</code>. Default password: <strong>admin123</strong></p>
+  <h1>Admin dashboard</h1>
+  <p style="color:#888;max-width:720px;">All data is stored in your browser (<code>localStorage</code>) for this class demo. Password: <strong>admin123</strong></p>
 
   <div class="admin-login" id="adminLoginBox">
     <label for="adminPass">Password</label>
     <input type="password" id="adminPass" autocomplete="current-password" style="width:100%;padding:10px;margin:8px 0;border-radius:8px;background:#121212;color:#fff;border:1px solid #444;">
-    <button type="button" id="adminLoginBtn" style="padding:10px 20px;border-radius:8px;cursor:pointer;background:#e50914;color:#fff;border:none;font-weight:bold;">Unlock panel</button>
+    <button type="button" id="adminLoginBtn" class="primary" style="padding:10px 20px;border-radius:8px;cursor:pointer;background:#e50914;color:#fff;border:none;font-weight:bold;">Sign in</button>
     <p id="adminLoginMsg" style="color:#f88;margin-top:10px;"></p>
   </div>
 
   <div class="admin-panel" id="adminPanel">
-    <p style="color:#8f8;">Session active on this browser.</p>
+    <p style="color:#8f8;">Session active in this browser.</p>
     <button type="button" id="adminLogout" style="margin-bottom:24px;padding:8px 16px;border-radius:8px;cursor:pointer;">Lock panel</button>
 
-    <h2>User reviews (<span id="reviewCount">0</span>)</h2>
-    <div id="adminReviews"></div>
+    <!-- Movies -->
+    <section class="admin-section">
+      <h2>Movies &amp; series (<span id="movieCount">0</span>)</h2>
+      <p style="color:#888;font-size:14px;">Add, edit, or remove catalog titles. “Copy bundled catalog” saves the default list to storage so edits apply across every page.</p>
+      <div class="admin-toolbar">
+        <button type="button" id="btnSeedCatalog">Copy bundled catalog to storage</button>
+        <button type="button" id="btnResetCatalog" class="danger">Remove custom catalog (revert to code defaults)</button>
+        <button type="button" id="btnExportJson">Show / copy JSON</button>
+        <label class="file-btn">Import JSON<input type="file" id="importJsonFile" accept="application/json,.json"></label>
+      </div>
+      <textarea id="exportJsonArea" placeholder="Click “Show / copy JSON” to fill export…" readonly></textarea>
 
-    <h2 style="margin-top:32px;">Forum posts (<span id="forumCount">0</span>)</h2>
-    <div id="adminForum"></div>
+      <h3 style="margin-top:24px;font-size:1rem;color:#f5c518;">Title editor</h3>
+      <form id="movieEditorForm" class="movie-editor-grid">
+        <input type="hidden" id="editMovieId" value="">
+        <label class="full">Title
+          <input type="text" id="m_title" required placeholder="Inception">
+        </label>
+        <label>Rating (/10)
+          <input type="number" id="m_rating" step="0.1" min="0" max="10" required value="7">
+        </label>
+        <label>Release year
+          <input type="number" id="m_year" min="1888" max="2100" required value="2024">
+        </label>
+        <label>Type
+          <select id="m_mediaType">
+            <option value="movie">Movie</option>
+            <option value="series">TV series</option>
+          </select>
+        </label>
+        <label>Region
+          <select id="m_region">
+            <option value="foreign">International</option>
+            <option value="arabic">Arabic cinema</option>
+          </select>
+        </label>
+        <label class="full">Poster path (e.g. images/poster.jpg)
+          <input type="text" id="m_poster" required placeholder="images/my-poster.jpg">
+        </label>
+        <label class="full">Genres (comma-separated)
+          <input type="text" id="m_genre" required placeholder="Action, Sci-Fi">
+        </label>
+        <label class="full">Director
+          <input type="text" id="m_director" required placeholder="Director name">
+        </label>
+        <label class="full">Cast (comma-separated)
+          <textarea id="m_cast" rows="2" placeholder="Actor A, Actor B"></textarea>
+        </label>
+        <label class="full">Description
+          <textarea id="m_description" rows="4" required placeholder="Plot summary…"></textarea>
+        </label>
+        <label class="full">YouTube trailer ID (optional)
+          <input type="text" id="m_trailer" placeholder="e.g. YoHD9XAuDmE">
+        </label>
+        <div class="full admin-toolbar" style="margin:0;">
+          <button type="submit" class="primary">Save title</button>
+          <button type="button" id="btnClearMovieForm">Clear form (new)</button>
+        </div>
+      </form>
+
+      <h3 style="margin-top:28px;font-size:1rem;color:#f5c518;">All titles</h3>
+      <input type="search" id="movieAdminFilter" placeholder="Filter list…" style="width:100%;max-width:400px;padding:10px;margin:12px 0;border-radius:8px;background:#1a1a1a;color:#fff;border:1px solid #333;">
+      <div id="movieListAdmin"></div>
+    </section>
+
+    <!-- Reviews -->
+    <section class="admin-section">
+      <h2>User reviews (<span id="reviewCount">0</span>)</h2>
+      <div id="adminReviews"></div>
+    </section>
+
+    <!-- Forum -->
+    <section class="admin-section">
+      <h2>Discussion forum (<span id="forumCount">0</span>)</h2>
+      <div id="adminForum"></div>
+    </section>
+
+    <!-- Registered users -->
+    <section class="admin-section">
+      <h2>Registered accounts (<span id="userCount">0</span>)</h2>
+      <p style="color:#888;font-size:14px;">Sign-up page users (demo).</p>
+      <div id="adminUsers"></div>
+    </section>
+
+    <!-- Subscriptions -->
+    <section class="admin-section">
+      <h2>Subscriptions (demo)</h2>
+      <p style="color:#888;font-size:14px;">Clear the subscription flag stored in this browser.</p>
+      <button type="button" id="btnClearSub">Clear saved subscription</button>
+    </section>
   </div>
 </main>
 
@@ -67,10 +171,13 @@
   const DEMO_PASS = 'admin123';
   const REVIEWS_KEY = 'movieReviews';
   const FORUM_KEY = 'forumPosts';
+  const USERS_KEY = 'mc_registered_users';
 
   const loginBox = document.getElementById('adminLoginBox');
   const panel = document.getElementById('adminPanel');
   const msg = document.getElementById('adminLoginMsg');
+
+  let editingNumericId = null;
 
   function esc(s) {
     if (s == null) return '';
@@ -93,6 +200,96 @@
     sessionStorage.removeItem(SESSION_KEY);
     loginBox.style.display = 'block';
     panel.classList.remove('visible');
+  }
+
+  function parseCast(str) {
+    return String(str || '').split(',').map(function (s) { return s.trim(); }).filter(Boolean);
+  }
+
+  function nextMovieId(list) {
+    const ids = list.map(function (m) { return Number(m.id) || 0; });
+    return (Math.max.apply(null, ids.concat([0])) || 0) + 1;
+  }
+
+  function normalizeMovie(raw) {
+    const m = Object.assign({}, raw);
+    m.id = parseInt(m.id, 10);
+    m.rating = parseFloat(m.rating);
+    m.year = parseInt(m.year, 10);
+    if (!Array.isArray(m.cast)) m.cast = parseCast(m.cast || '');
+    if (!m.reviews) m.reviews = [];
+    if (!m.mediaType) m.mediaType = 'movie';
+    if (!m.region) m.region = 'foreign';
+    m.genre = String(m.genre || '');
+    m.director = String(m.director || '');
+    m.description = String(m.description || '');
+    m.poster = String(m.poster || 'images/placeholder.jpg');
+    m.title = String(m.title || '').trim();
+    if (m.trailerYoutubeId) m.trailerYoutubeId = String(m.trailerYoutubeId).trim();
+    else delete m.trailerYoutubeId;
+    return m;
+  }
+
+  function getCatalog() {
+    return typeof getMoviesDb === 'function' ? getMoviesDb().slice() : [];
+  }
+
+  function saveCatalog(arr) {
+    const cleaned = arr.map(function (m) { return normalizeMovie(m); });
+    if (typeof saveMoviesCatalogToStorage === 'function') {
+      saveMoviesCatalogToStorage(cleaned);
+    }
+  }
+
+  function renderMovieAdminList() {
+    const el = document.getElementById('movieListAdmin');
+    const q = (document.getElementById('movieAdminFilter') || {}).value || '';
+    const ql = q.toLowerCase().trim();
+    let list = getCatalog();
+    if (ql) {
+      list = list.filter(function (m) {
+        return String(m.title).toLowerCase().includes(ql) || String(m.genre).toLowerCase().includes(ql);
+      });
+    }
+    document.getElementById('movieCount').textContent = String(getCatalog().length);
+    if (!list.length) {
+      el.innerHTML = '<p style="color:#888;">No results.</p>';
+      return;
+    }
+    el.innerHTML = list.map(function (m) {
+      return '<div class="movie-row" data-mid="' + esc(m.id) + '">' +
+        '<div class="movie-row-meta"><strong>#' + esc(m.id) + ' — ' + esc(m.title) + '</strong> (' + esc(m.year) + ') · ⭐ ' + esc(m.rating) +
+        '<br><span style="color:#888;font-size:13px;">' + esc(m.genre) + ' · ' + esc(m.mediaType) + '</span></div>' +
+        '<div class="movie-row-actions">' +
+        '<button type="button" class="btn-edit-movie">Edit</button>' +
+        '<button type="button" class="btn-del-movie danger">Delete</button>' +
+        '</div></div>';
+    }).join('');
+  }
+
+  function fillMovieForm(m) {
+    editingNumericId = m.id;
+    document.getElementById('editMovieId').value = String(m.id);
+    document.getElementById('m_title').value = m.title;
+    document.getElementById('m_rating').value = m.rating;
+    document.getElementById('m_year').value = m.year;
+    document.getElementById('m_mediaType').value = (m.mediaType || 'movie').toLowerCase() === 'series' ? 'series' : 'movie';
+    document.getElementById('m_region').value = (m.region || 'foreign').toLowerCase() === 'arabic' ? 'arabic' : 'foreign';
+    document.getElementById('m_poster').value = m.poster;
+    document.getElementById('m_genre').value = m.genre;
+    document.getElementById('m_director').value = m.director;
+    document.getElementById('m_cast').value = (m.cast || []).join(', ');
+    document.getElementById('m_description').value = m.description;
+    document.getElementById('m_trailer').value = m.trailerYoutubeId || '';
+    document.getElementById('movieEditorForm').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function clearMovieForm() {
+    editingNumericId = null;
+    document.getElementById('editMovieId').value = '';
+    document.getElementById('movieEditorForm').reset();
+    document.getElementById('m_rating').value = '7';
+    document.getElementById('m_year').value = '2024';
   }
 
   function renderReviews() {
@@ -121,9 +318,25 @@
     }).join('');
   }
 
+  function renderUsers() {
+    const el = document.getElementById('adminUsers');
+    const users = JSON.parse(localStorage.getItem(USERS_KEY) || '[]');
+    document.getElementById('userCount').textContent = String(users.length);
+    if (!users.length) {
+      el.innerHTML = '<p style="color:#888;">No registered users yet.</p>';
+      return;
+    }
+    el.innerHTML = users.map(function (u, i) {
+      return '<div class="mod-item" data-user-index="' + i + '"><strong>' + esc(u.name || '') + '</strong><br><span style="color:#aaa;">' + esc(u.email || '') + '</span><br><button type="button" class="del-user">Delete account</button></div>';
+    }).join('');
+  }
+
   function renderAll() {
+    renderMovieAdminList();
     renderReviews();
     renderForum();
+    renderUsers();
+    document.getElementById('exportJsonArea').value = '';
   }
 
   document.getElementById('adminLoginBtn').addEventListener('click', function () {
@@ -138,6 +351,104 @@
   });
 
   document.getElementById('adminLogout').addEventListener('click', hidePanel);
+
+  document.getElementById('btnSeedCatalog').addEventListener('click', function () {
+    if (!isAuthed()) return;
+    if (!confirm('This will replace the stored catalog with a full copy of the bundled default list. Continue?')) return;
+    const copy = typeof getBundledMoviesDefault === 'function' ? getBundledMoviesDefault() : [];
+    saveCatalog(copy);
+    clearMovieForm();
+    renderMovieAdminList();
+    alert('Saved. Refresh the home page to see changes.');
+  });
+
+  document.getElementById('btnResetCatalog').addEventListener('click', function () {
+    if (!isAuthed()) return;
+    if (!confirm('Remove the custom catalog? The site will read titles from the code file only.')) return;
+    if (typeof resetMoviesCatalogToBundledDefault === 'function') resetMoviesCatalogToBundledDefault();
+    clearMovieForm();
+    renderMovieAdminList();
+    alert('Done. Reload other open tabs.');
+  });
+
+  document.getElementById('btnExportJson').addEventListener('click', function () {
+    if (!isAuthed()) return;
+    document.getElementById('exportJsonArea').value = JSON.stringify(getCatalog(), null, 2);
+  });
+
+  document.getElementById('importJsonFile').addEventListener('change', function (e) {
+    if (!isAuthed()) return;
+    const f = e.target.files && e.target.files[0];
+    if (!f) return;
+    const r = new FileReader();
+    r.onload = function () {
+      try {
+        const data = JSON.parse(r.result);
+        if (!Array.isArray(data)) throw new Error('Not an array');
+        saveCatalog(data);
+        renderMovieAdminList();
+        alert('Imported ' + data.length + ' titles.');
+      } catch (err) {
+        alert('Invalid JSON file.');
+      }
+      e.target.value = '';
+    };
+    r.readAsText(f);
+  });
+
+  document.getElementById('movieEditorForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (!isAuthed()) return;
+    const list = getCatalog();
+    const trailerVal = document.getElementById('m_trailer').value.trim();
+    const prev = editingNumericId != null ? list.find(function (m) { return m.id === editingNumericId; }) : null;
+    const obj = {
+      id: editingNumericId != null ? editingNumericId : nextMovieId(list),
+      title: document.getElementById('m_title').value.trim(),
+      rating: document.getElementById('m_rating').value,
+      year: document.getElementById('m_year').value,
+      poster: document.getElementById('m_poster').value.trim(),
+      genre: document.getElementById('m_genre').value.trim(),
+      director: document.getElementById('m_director').value.trim(),
+      cast: parseCast(document.getElementById('m_cast').value),
+      description: document.getElementById('m_description').value.trim(),
+      mediaType: document.getElementById('m_mediaType').value,
+      region: document.getElementById('m_region').value,
+      reviews: prev && Array.isArray(prev.reviews) ? prev.reviews.slice() : []
+    };
+    if (trailerVal) obj.trailerYoutubeId = trailerVal;
+    let out;
+    if (editingNumericId != null) {
+      out = list.map(function (m) { return m.id === editingNumericId ? normalizeMovie(obj) : m; });
+    } else {
+      out = list.concat([normalizeMovie(obj)]);
+    }
+    saveCatalog(out);
+    clearMovieForm();
+    renderMovieAdminList();
+    alert('Title saved.');
+  });
+
+  document.getElementById('btnClearMovieForm').addEventListener('click', clearMovieForm);
+
+  document.getElementById('movieAdminFilter').addEventListener('input', renderMovieAdminList);
+
+  document.getElementById('movieListAdmin').addEventListener('click', function (e) {
+    if (!isAuthed()) return;
+    const row = e.target.closest('.movie-row');
+    if (!row) return;
+    const id = parseInt(row.getAttribute('data-mid'), 10);
+    const list = getCatalog();
+    const m = list.find(function (x) { return x.id === id; });
+    if (!m) return;
+    if (e.target.classList.contains('btn-edit-movie')) fillMovieForm(m);
+    if (e.target.classList.contains('btn-del-movie')) {
+      if (!confirm('Delete “' + m.title + '”?')) return;
+      saveCatalog(list.filter(function (x) { return x.id !== id; }));
+      if (editingNumericId === id) clearMovieForm();
+      renderMovieAdminList();
+    }
+  });
 
   document.getElementById('adminReviews').addEventListener('click', function (e) {
     if (!isAuthed() || !e.target.classList.contains('del-review')) return;
@@ -157,6 +468,23 @@
     posts = posts.filter(function (p) { return String(p.id) !== id; });
     localStorage.setItem(FORUM_KEY, JSON.stringify(posts));
     renderForum();
+  });
+
+  document.getElementById('adminUsers').addEventListener('click', function (e) {
+    if (!isAuthed() || !e.target.classList.contains('del-user')) return;
+    const item = e.target.closest('.mod-item');
+    const i = parseInt(item.getAttribute('data-user-index'), 10);
+    let users = JSON.parse(localStorage.getItem(USERS_KEY) || '[]');
+    users.splice(i, 1);
+    localStorage.setItem(USERS_KEY, JSON.stringify(users));
+    renderUsers();
+  });
+
+  document.getElementById('btnClearSub').addEventListener('click', function () {
+    if (!isAuthed()) return;
+    localStorage.removeItem('mc_subscription_tier');
+    localStorage.removeItem('mc_subscription_until');
+    alert('Subscription cleared.');
   });
 
   if (isAuthed()) showPanel();

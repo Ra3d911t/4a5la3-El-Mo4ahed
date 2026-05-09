@@ -1,7 +1,7 @@
 // ========================
 // CENTRAL MOVIES DATABASE
 // ========================
-const moviesDatabase = [
+const bundledMoviesDatabase = [
   {
     id: 1,
     title: "Inception",
@@ -172,13 +172,13 @@ const moviesDatabase = [
   },
   {
     id: 13,
-    title: "الرجل العناب",
+    title: "The Crimson",
     rating: 6.5,
     year: 2016,
     poster: "images/الرجل-العناب.jpg",
-    description: "فيلم أكشن مصري - يانهار ازرق الرجل العبدالمعبود. قصة مثيرة عن رجل غامض يحارب الظلم.",
-    cast: ["احمد فهمي"],
-    director: "محمد سامي",
+    description: "Egyptian action film about a mysterious man who fights injustice.",
+    cast: ["Ahmed Fahmy"],
+    director: "Mohamed Samy",
     genre: "Action, Drama",
     mediaType: "series",
     region: "arabic",
@@ -200,13 +200,13 @@ const moviesDatabase = [
   },
   {
     id: 15,
-    title: "ورق التوت",
+    title: "Mulberry Paper",
     rating: 6.8,
     year: 2024,
     poster: "images/ورق-التوت.jpg",
-    description: "فيلم مصري درامي من إنتاج Seagle Films، قصة اجتماعية مشوقة.",
-    cast: ["جميلة عوض", "اسماء جلال "],
-    director: "محمد جمال العدل",
+    description: "Egyptian drama from Seagle Films with a gripping social story.",
+    cast: ["Jamila Awad", "Asmaa Galal"],
+    director: "Mohamed Gamal El-Adl",
     genre: "Drama, Social",
     mediaType: "movie",
     region: "arabic", 
@@ -214,13 +214,13 @@ const moviesDatabase = [
   },
   {
     id: 16,
-    title: "برشامه",
+    title: "Pills",
     rating: 7.0,
     year: 2024,
     poster: "images/برشامه.jpg",
-    description: "فيلم مصري من إنتاج أحمد الدسوقي، بطولة أحمد الزغبي، شيرين دياب، خالد دياب. فيلم أكشن كوميدي.",
-    cast: ["أحمد الزغبي", "شيرين دياب", " هشام ماجد", "أحمد الدسوقي"],
-    director: "أحمد دياب",
+    description: "Egyptian action comedy produced by Ahmed El-Desouky starring Ahmed El-Zahaby, Sherine Diab, and Hesham Majed.",
+    cast: ["Ahmed El-Zahaby", "Sherine Diab", "Hesham Majed", "Ahmed El-Desouky"],
+    director: "Ahmed Diab",
     genre: "Action, Comedy",
     mediaType: "movie",
     region: "arabic",  
@@ -228,13 +228,13 @@ const moviesDatabase = [
   },
   {
     id: 17,
-    title: "ولاد رزق 2",
+    title: "Sons of Rizk 2",
     rating: 7.3,
     year: 2019,
     poster: "images/welad-rezk.jpg",
-    description: "فيلم أكشن مصري - وعدة أسود الارض. الجزء الثاني من سلسلة ولاد رزق، قصة 4 إخوة يعيشون حياة الجريمة.",
-    cast: ["أحمد عز", "عمرو يوسف", "أحمد الفيشاوي", "محمد ممدوح", "كريم قاسم"],
-    director: "طارق العريان",
+    description: "Egyptian action sequel: four brothers navigate a life of crime.",
+    cast: ["Ahmed Ezz", "Amr Youssef", "Ahmed El-Fishawy", "Mohamed Mamdouh", "Karim Kassem"],
+    director: "Tarek Alarian",
     genre: "Action, Crime, Drama",
     mediaType: "movie",
     region: "arabic", 
@@ -284,13 +284,13 @@ const moviesDatabase = [
   },
   {
     id: 21,
-    title: "ابن القنصل",
+    title: "Son of the Consul",
     rating: 6.2,
     year: 2020,
     poster: "images/ابن القنصل.jpg",
-    description: "فيلم أكشن مصري - قصة تشويق وإثارة حول ابن القنصل الذي يقع في العديد من المشاكل.",
-    cast: ["احمد السقا", "غاده عادل"],
-    director: "محمد سامي",
+    description: "Egyptian action thriller about the consul’s son caught in escalating trouble.",
+    cast: ["Ahmed El-Sakka", "Ghada Adel"],
+    director: "Mohamed Samy",
     genre: "Action, Drama",
     mediaType: "movie",
     region: "arabic",
@@ -326,13 +326,13 @@ const moviesDatabase = [
   },
   {
   id: 24,
-  title: "وتر حساس",
+  title: "Sensitive String",
   rating: 6.8,
   year: 2024,
   poster: "images/وتر حساس.jpg",
-  description: "فيلم مصري درامي رومانسي، يدور حول قصة حب معقدة تتخللها المشاعر المتناقضة والأسرار العائلية التي تنكشف بمرور الوقت.",
-  cast: ["أحمد داود", "جميلة عوض", "أحمد خالد صالح"],
-  director: "محمد جمال العدل",
+  description: "Egyptian romantic drama about a complicated love story and family secrets.",
+  cast: ["Ahmed Dawoud", "Jamila Awad", "Ahmed Khaled Saleh"],
+  director: "Mohamed Gamal El-Adl",
   genre: "Drama, Romance",
   mediaType: "series",
   region: "arabic",
@@ -340,13 +340,13 @@ const moviesDatabase = [
   },
   {
   id: 25,
-  title: "فقرة الساحر",
+  title: "The Wizard’s Act",
   rating: 6.5,
   year: 2024,
   poster: "images/فقرة الساحر.jpg",
-  description: "فيلم أكشن مصري، يقدم قصة مثيرة ومليئة بالتشويق حول رجل غامض يمتلك مهارات خارقة يواجه عالم الجريمة المنظمة.",
-  cast: ["محمد رمضان", "نسرين طافش", "محمد ممدوح"],
-  director: "طارق العريان",
+  description: "Egyptian action film about a mysterious man with extraordinary skills facing organized crime.",
+  cast: ["Mohamed Ramadan", "Nesreen Tafesh", "Mohamed Mamdouh"],
+  director: "Tarek Alarian",
   genre: "Action, Thriller",
   mediaType: "series",
   region: "arabic",
@@ -354,13 +354,13 @@ const moviesDatabase = [
   },
   {
   id: 26,
-  title: "اشغال شقة",
+  title: "Apartment Business",
   rating: 7.0,
   year: 2024,
   poster: "images/اشغال شقه.jpg",
-  description: "فيلم كوميدي مصري، يدور حول شابين يواجهان مواقف طريفة ومضحكة أثناء تجهيز شقة للزواج، وتتوالى المفاجآت غير المتوقعة.",
-  cast: ["هشام ماجد", "شيكو", "أحمد فهمي", "نسرين أمين"],
-  director: "خالد مرعي",
+  description: "Egyptian comedy about two friends preparing a flat for a wedding and unexpected mishaps.",
+  cast: ["Hesham Majed", "Chico", "Ahmed Fahmy", "Nesrine Amin"],
+  director: "Khaled Marei",
   genre: "Comedy",
   mediaType: "series",
   region: "arabic",
@@ -368,13 +368,13 @@ const moviesDatabase = [
   },
   {
   id: 27,
-  title: "موضوع عائلي",
+  title: "Family Matter",
   rating: 7.2,
   year: 2023,
   poster: "images/موضوع عائلى.jpg",
-  description: "فيلم مصري كوميدي درامي، يحكي قصة عائلة تواجه العديد من المشاكل والمواقف المضحكة التي تهدد بتفككها، ولكن الحب يجمعهم في النهاية.",
-  cast: ["ليلى علوي", "شيرين رضا", "محمود حميدة", "جميلة عوض"],
-  director: "هالة خليل",
+  description: "Egyptian comedy-drama about a family facing problems that threaten to pull them apart.",
+  cast: ["Laila Eloui", "Sherine Reda", "Mahmoud Hemida", "Jamila Awad"],
+  director: "Hala Khalil",
   genre: "Comedy, Drama",
   mediaType: "series",
   region: "arabic",
@@ -382,13 +382,13 @@ const moviesDatabase = [
   },   
   {
   id: 28,
-  title: "العائدون",
+  title: "The Returnees",
   rating: 7.6,
   year: 2022,
   poster: "images/العائدون.jpg",
-  description: "مسلسل مصري درامي تشويقي، يتناول قصة مجموعة من المصريين العائدين من الخارج بعد سنوات من الغربة، وتفاجئهم بالتحديات والمفاجآت الجديدة.",
-  cast: ["أمير كرارة", "أمينة خليل", "محمود عبد المغني", "محمد ممدوح"],
-  director: "أحمد نادر جلال",
+  description: "Egyptian thriller series about Egyptians returning home after years abroad and facing new challenges.",
+  cast: ["Amir Karara", "Amina Khalil", "Mahmoud Abdel-Moghny", "Mohamed Mamdouh"],
+  director: "Ahmed Nader Galal",
   genre: "Drama, Thriller",
   mediaType: "series",
   region: "arabic",
@@ -396,13 +396,13 @@ const moviesDatabase = [
   },
   {
   id: 29,
-  title: "بقينا اتنين",
+  title: "Just the Two of Us",
   rating: 7.8,
   year: 2022,
   poster: "images/بقينا اتنين.jpg",
-  description: "مسلسل مصري درامي اجتماعي رومانسي، يحكي قصة زوجين يواجهان العديد من التحديات في حياتهما بعد سنوات من الزواج، ويحاولان إنقاذ علاقتهما.",
-  cast: ["شيرين رضا", "أحمد داود", "كريم فهمي", "أسماء جلال"],
-  director: "طارق رفعت",
+  description: "Egyptian drama about a married couple trying to save their relationship after years together.",
+  cast: ["Sherine Reda", "Ahmed Dawoud", "Karim Fahmy", "Asmaa Galal"],
+  director: "Tarek Rifaat",
   genre: "Drama, Romance",
   mediaType: "series",
   region: "arabic",
@@ -410,13 +410,13 @@ const moviesDatabase = [
   },
   {
   id: 30,
-  title: "كامل العدد",
+  title: "Full House",
   rating: 7.3,
   year: 2023,
   poster: "images/كامل العدد.jpg",
-  description: "مسلسل مصري كوميدي درامي، تدور قصته حول عائلة مصرية تواجه العديد من المواقف الكوميدية والإنسانية مع زيادة عدد أفراد الأسرة.",
-  cast: ["دينا الشربيني", "شريف سلامة", "إسعاد يونس", "محمد كيلاني"],
-  director: "خالد الحلفاوي",
+  description: "Egyptian comedy-drama series about a growing family and everyday chaos.",
+  cast: ["Dina El-Sherbiny", "Sherif Salama", "Esaad Younes", "Mohamed Kelany"],
+  director: "Khaled El-Halfawy",
   genre: "Comedy, Drama",
   mediaType: "series",
   region: "arabic",
@@ -621,6 +621,50 @@ const moviesDatabase = [
   
 ];
 
+const MOVIES_CATALOG_KEY = "mc_movies_catalog";
+let _moviesDbCache = null;
+
+function invalidateMoviesDbCache() {
+  _moviesDbCache = null;
+}
+
+function getMoviesDb() {
+  if (_moviesDbCache) return _moviesDbCache;
+  try {
+    const raw = localStorage.getItem(MOVIES_CATALOG_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        _moviesDbCache = parsed;
+        return _moviesDbCache;
+      }
+    }
+  } catch (e) {
+    console.warn("Movies catalog parse error", e);
+  }
+  _moviesDbCache = bundledMoviesDatabase;
+  return _moviesDbCache;
+}
+
+function saveMoviesCatalogToStorage(list) {
+  localStorage.setItem(MOVIES_CATALOG_KEY, JSON.stringify(list));
+  invalidateMoviesDbCache();
+  _moviesDbCache = list;
+}
+
+function resetMoviesCatalogToBundledDefault() {
+  localStorage.removeItem(MOVIES_CATALOG_KEY);
+  invalidateMoviesDbCache();
+}
+
+window.saveMoviesCatalogToStorage = saveMoviesCatalogToStorage;
+window.resetMoviesCatalogToBundledDefault = resetMoviesCatalogToBundledDefault;
+window.invalidateMoviesDbCache = invalidateMoviesDbCache;
+window.getMoviesDb = getMoviesDb;
+window.getBundledMoviesDefault = function () {
+  return JSON.parse(JSON.stringify(bundledMoviesDatabase));
+};
+
 /** YouTube video IDs for trailers (demo). Optional per-movie override: movie.trailerYoutubeId */
 const TRAILER_IDS = {
   Inception: "YoHD9XAuDmE",
@@ -648,7 +692,7 @@ function getTrailerYoutubeId(movie) {
 }
 
 function getMovieById(id) {
-  return moviesDatabase.find(movie => movie.id === parseInt(id));
+  return getMoviesDb().find(movie => movie.id === parseInt(id, 10));
 }
 
 // ——— Subscription (demo, localStorage) ———
@@ -718,7 +762,7 @@ function displaySearchResults(movies) {
 function populateBrowseYearSelect(selectId) {
   const sel = document.getElementById(selectId);
   if (!sel || sel.dataset.populated === "1") return;
-  const years = [...new Set(moviesDatabase.map(m => m.year))].sort((a, b) => b - a);
+  const years = [...new Set(getMoviesDb().map(m => m.year))].sort((a, b) => b - a);
   const current = sel.value;
   sel.innerHTML = '<option value="all">All years</option>' + years.map(y => `<option value="${y}">${y}</option>`).join("");
   if (current && [...sel.options].some(o => o.value === current)) sel.value = current;
@@ -775,9 +819,9 @@ function performSearch() {
 
   const query = searchInput.value.toLowerCase().trim();
   if (query === "") {
-    window._searchFiltered = moviesDatabase.slice();
+    window._searchFiltered = getMoviesDb().slice();
   } else {
-    window._searchFiltered = moviesDatabase.filter(movie =>
+    window._searchFiltered = getMoviesDb().filter(movie =>
       movie.title.toLowerCase().includes(query) ||
       movie.genre.toLowerCase().includes(query) ||
       (movie.director && movie.director.toLowerCase().includes(query)) ||
@@ -804,10 +848,10 @@ if (searchInput && searchResults) {
       }
     });
 
-    let filteredMovies = moviesDatabase;
+    let filteredMovies = getMoviesDb();
 
     if (genreParam !== "all") {
-      filteredMovies = moviesDatabase.filter(movie => {
+      filteredMovies = getMoviesDb().filter(movie => {
         const movieGenres = movie.genre.toLowerCase();
         return movieGenres.includes(genreParam.toLowerCase());
       });
@@ -817,7 +861,7 @@ if (searchInput && searchResults) {
     populateBrowseYearSelect("searchYearSelect");
     applySearchBrowseAndDisplay();
   } else {
-    window._searchFiltered = moviesDatabase.slice();
+    window._searchFiltered = getMoviesDb().slice();
     populateBrowseYearSelect("searchYearSelect");
     applySearchBrowseAndDisplay();
   }
@@ -830,7 +874,7 @@ if (searchInput && searchResults) {
     if (el) el.addEventListener("change", () => applySearchBrowseAndDisplay());
   });
 
-  console.log("🔍 Search page loaded with " + moviesDatabase.length + " movies");
+  console.log("🔍 Search page loaded with " + getMoviesDb().length + " movies");
 }
 
 window.filterSearchByGenre = function (genre, ev) {
@@ -849,14 +893,14 @@ window.filterSearchByGenre = function (genre, ev) {
     }
 
     const g = String(genre || "all").toLowerCase();
-    let filteredMovies = moviesDatabase;
+    let filteredMovies = getMoviesDb();
 
     if (g === "all") {
-      filteredMovies = moviesDatabase.filter(m => (m.mediaType || "").toLowerCase() === "movie");
+      filteredMovies = getMoviesDb().filter(m => (m.mediaType || "").toLowerCase() === "movie");
     } else if (g === "series") {
-      filteredMovies = moviesDatabase.filter(m => (m.mediaType || "").toLowerCase() === "series");
+      filteredMovies = getMoviesDb().filter(m => (m.mediaType || "").toLowerCase() === "series");
     } else {
-      filteredMovies = moviesDatabase.filter(movie => {
+      filteredMovies = getMoviesDb().filter(movie => {
         const movieGenres = String(movie.genre || "").toLowerCase();
         const isMatch = movieGenres.includes(g);
         console.log("Movie:", movie.title, "Genre:", movie.genre, "Match:", isMatch);
@@ -890,7 +934,7 @@ const movieList = document.getElementById("movieList");
 const trendingMovies = document.getElementById("trendingMovies");
 
 if (movieList) {
-  window._homeFiltered = moviesDatabase.filter(m => (m.mediaType || "").toLowerCase() === "movie");
+  window._homeFiltered = getMoviesDb().filter(m => (m.mediaType || "").toLowerCase() === "movie");
   populateBrowseYearSelect("homeYearSelect");
   applyHomeBrowseAndDisplay();
   ["homeSortSelect", "homeYearSelect"].forEach(id => {
@@ -901,7 +945,7 @@ if (movieList) {
 
 // Load trending movies (top rated)
 if (trendingMovies) {
-  const trending = moviesDatabase
+  const trending = getMoviesDb()
     .sort((a, b) => b.rating - a.rating)
     .slice(0, 10); // Top 10 rated movies
   
@@ -953,16 +997,16 @@ window.filterByGenreOnMain = function(genre, ev) {
     }
     
     const g = String(genre || "all").toLowerCase();
-    let filteredMovies = moviesDatabase;
+    let filteredMovies = getMoviesDb();
 
     // Default "All Movies" on home = mediaType movie
     if (g === "all") {
-      filteredMovies = moviesDatabase.filter(m => (m.mediaType || "").toLowerCase() === "movie");
+      filteredMovies = getMoviesDb().filter(m => (m.mediaType || "").toLowerCase() === "movie");
     } else if (g === "series") {
-      filteredMovies = moviesDatabase.filter(m => (m.mediaType || "").toLowerCase() === "series");
+      filteredMovies = getMoviesDb().filter(m => (m.mediaType || "").toLowerCase() === "series");
     } else {
       // Genre filter shows BOTH movies + series that match this genre
-      filteredMovies = moviesDatabase.filter(movie => {
+      filteredMovies = getMoviesDb().filter(movie => {
         const movieGenres = String(movie.genre || "").toLowerCase();
         const isMatch = movieGenres.includes(g);
         console.log('Movie:', movie.title, 'Genre:', movie.genre, 'Match:', isMatch);
@@ -1013,7 +1057,7 @@ function loadFeaturedToday() {
   if (!featuredContainer) return;
 
   // Select 6 random movies/TV shows from the database
-  const shuffled = [...moviesDatabase];
+  const shuffled = [...getMoviesDb()];
   for (let i = shuffled.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
@@ -1126,7 +1170,7 @@ const celebritiesDatabase = [
     name: "Ahmed Ezz",
     role: "Actor",
     country: "Egypt",
-    knownFor: ["ولاد رزق 2", "ابو عمر المصري", "الخلية"],
+    knownFor: ["Sons of Rizk 2", "Abu Omar El-Masry", "The Cell"],
     image: "images/Ahmed.jpg",
     rating: 8.6
   },
@@ -1135,7 +1179,7 @@ const celebritiesDatabase = [
     name: "Dina El-Sherbiny",
     role: "Actress",
     country: "Egypt",
-    knownFor: ["كامل العدد", "ليلى", "أبو البنات"],
+    knownFor: ["Full House", "Leila", "Father of Girls"],
     image: "images/Dina.jpg",
     rating: 8.0
   },
@@ -1215,7 +1259,7 @@ function loadWhatToWatch() {
   if (!container) return;
 
   // Get 4 random movies/series
-  const shuffled = [...moviesDatabase];
+  const shuffled = [...getMoviesDb()];
   for (let i = shuffled.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
@@ -1240,7 +1284,7 @@ function loadTop10() {
   if (!container) return;
 
   // Sort by rating (highest first) and take top 10
-  const top10 = [...moviesDatabase].sort((a, b) => b.rating - a.rating).slice(0, 10);
+  const top10 = [...getMoviesDb()].sort((a, b) => b.rating - a.rating).slice(0, 10);
 
   container.innerHTML = top10.map((item, index) => {
     let rankClass = "";
@@ -1290,10 +1334,10 @@ function loadPopularInterests() {
 
 function filterByInterest(filter) {
   if (filter === "series") {
-    const seriesCount = moviesDatabase.filter(m => m.mediaType === "series").length;
+    const seriesCount = getMoviesDb().filter(m => m.mediaType === "series").length;
     alert(`📺 We have ${seriesCount} TV Series in our database!\n\nCheck them out in the Search page!`);
   } else {
-    const count = moviesDatabase.filter(m => m.genre.includes(filter)).length;
+    const count = getMoviesDb().filter(m => m.genre.includes(filter)).length;
     alert(`🎬 ${filter} category has ${count} titles!\n\nGo to Search page and type "${filter}" to find them!`);
   }
 }
@@ -1341,7 +1385,7 @@ if (watchDiv) {
     `;
   } else {
     // Get all movies in watchlist
-    allWatchlistMovies = list.map(id => moviesDatabase.find(m => m.id === id)).filter(m => m);
+    allWatchlistMovies = list.map(id => getMoviesDb().find(m => m.id === id)).filter(m => m);
     displayWatchlistMovies(allWatchlistMovies);
   }
 }
@@ -1540,9 +1584,9 @@ function loadReviews(filterMovieQuery = "") {
 if (reviewForm && reviewsList) {
   loadReviews();
 
-  // Autocomplete for movie name (from moviesDatabase)
-  if (movieNameSuggestions && Array.isArray(moviesDatabase)) {
-    const titles = [...new Set(moviesDatabase.map(m => m && m.title).filter(Boolean))]
+  // Autocomplete for movie name (from getMoviesDb())
+  if (movieNameSuggestions && Array.isArray(getMoviesDb())) {
+    const titles = [...new Set(getMoviesDb().map(m => m && m.title).filter(Boolean))]
       .sort((a, b) => a.localeCompare(b));
     movieNameSuggestions.innerHTML = titles
       .map(t => `<option value="${escapeHtml(t)}"></option>`)

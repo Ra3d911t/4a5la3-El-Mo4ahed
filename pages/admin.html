@@ -27,31 +27,18 @@
 </nav>
 
 <main class="page-main">
-  <h1>Admin dashboard</h1>
-  <p style="color:#888;max-width:720px;">All data is stored in your browser (<code>localStorage</code>) for this class demo. Password: <strong>admin123</strong></p>
-
   <div class="admin-login" id="adminLoginBox">
     <label for="adminPass">Password</label>
     <input type="password" id="adminPass" autocomplete="current-password" style="width:100%;padding:10px;margin:8px 0;border-radius:8px;background:#121212;color:#fff;border:1px solid #444;">
-    <button type="button" id="adminLoginBtn" class="primary" style="padding:10px 20px;border-radius:8px;cursor:pointer;background:#e50914;color:#fff;border:none;font-weight:bold;">Sign in</button>
-    <p id="adminLoginMsg" style="color:#f88;margin-top:10px;"></p>
+    <button type="button" id="adminLoginBtn" class="primary" style="padding:10px 20px;border-radius:8px;cursor:pointer;background:#f5c518;color:#fff;border:none;font-weight:bold;">Sign in</button>
+    <p id="adminLoginMsg" style="color:#f5c518;margin-top:10px;"></p>
   </div>
 
   <div class="admin-panel" id="adminPanel">
-    <p style="color:#8f8;">Session active in this browser.</p>
-    <button type="button" id="adminLogout" style="margin-bottom:24px;padding:8px 16px;border-radius:8px;cursor:pointer;">Lock panel</button>
 
     <!-- Movies -->
     <section class="admin-section">
       <h2>Movies &amp; series (<span id="movieCount">0</span>)</h2>
-      <p style="color:#888;font-size:14px;">Add, edit, or remove catalog titles. “Copy bundled catalog” saves the default list to storage so edits apply across every page.</p>
-      <div class="admin-toolbar">
-        <button type="button" id="btnSeedCatalog">Copy bundled catalog to storage</button>
-        <button type="button" id="btnResetCatalog" class="danger">Remove custom catalog (revert to code defaults)</button>
-        <button type="button" id="btnExportJson">Show / copy JSON</button>
-        <label class="file-btn">Import JSON<input type="file" id="importJsonFile" accept="application/json,.json"></label>
-      </div>
-      <textarea id="exportJsonArea" placeholder="Click “Show / copy JSON” to fill export…" readonly></textarea>
 
       <h3 style="margin-top:24px;font-size:1rem;color:#f5c518;">Title editor</h3>
       <form id="movieEditorForm" class="movie-editor-grid">

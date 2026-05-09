@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Watchlist — Movie cave</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .watchlist-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .watchlist-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    .watchlist-header h1 {
+      color: #f5c518;
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+    }
+    .watchlist-grid {
+      display: flex;
+      gap: 25px;
+      flex-wrap: wrap;
+      justify-content: center;
+      padding: 20px;
+    }
+    .watchlist-item {
+      background: linear-gradient(145deg, #1f1f1f, #2a2a2a);
+      padding: 15px;
+      width: 220px;
+      border-radius: 16px;
+      text-align: center;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(245, 197, 24, 0.1);
+    }
+    .watchlist-item::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(45deg, transparent, rgba(245, 197, 24, 0.1), transparent);
+      transform: translateX(-100%);
+      transition: transform 0.6s;
+    }
+    .watchlist-item:hover::before {
+      transform: translateX(100%);
+    }
+    .watchlist-item:hover {
+      transform: translateY(-12px) scale(1.02);
+      box-shadow: 0 20px 40px rgba(245, 197, 24, 0.4);
+      border-color: rgba(245, 197, 24, 0.3);
+    }
+    .watchlist-item img {
+      width: 100%;
+      border-radius: 12px;
+      height: 280px;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+    .watchlist-item:hover img {
+      transform: scale(1.05);
+    }
+    .watchlist-info {
+      padding: 15px;
+    }
+    .watchlist-info h3 {
+      margin: 0 0 8px;
+      color: #f5c518;
+      font-size: 1.2rem;
+    }
+    .watchlist-info p {
+      margin: 5px 0;
+      color: #ccc;
+      font-size: 0.9rem;
+    }
+    .watchlist-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+    .watchlist-actions button {
+      flex: 1;
+      padding: 10px 12px;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .btn-remove {
+      background: linear-gradient(135deg, #dc3545, #c82333);
+      color: white;
+    }
+    .btn-remove:hover {
+      background: linear-gradient(135deg, #c82333, #a02622);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4);
+    }
+    .btn-view {
+      background: linear-gradient(135deg, #f5c518, #e0b000);
+      color: #121212;
+    }
+    .btn-view:hover {
+      background: linear-gradient(135deg, #e0b000, #c9a000);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(245, 197, 24, 0.4);
+    }
+    .empty-watchlist {
+      text-align: center;
+      padding: 60px 20px;
+      color: #888;
+    }
+    .empty-watchlist h2 {
+      font-size: 1.8rem;
+      margin-bottom: 20px;
+    }
+    .empty-watchlist p {
+      font-size: 1.1rem;
+      margin-bottom: 30px;
+    }
+    .empty-watchlist a {
+      display: inline-block;
+      background: #f5c518;
+      color: #121212;
+      padding: 12px 24px;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: bold;
+      transition: background 0.3s;
+    }
+    .empty-watchlist a:hover {
+      background: #e0b000;
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 1200px) {
+      .watchlist-grid {
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .watchlist-grid {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 15px;
+      }
+      .watchlist-item img {
+        height: 240px;
+      }
+      .watchlist-info h3 {
+        font-size: 1rem;
+      }
+      .watchlist-info p {
+        font-size: 0.8rem;
+      }
+      .watchlist-actions button {
+        font-size: 0.75rem;
+        padding: 8px 10px;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .watchlist-grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 12px;
+      }
+      .watchlist-item img {
+        height: 200px;
+      }
+      .watchlist-info {
+        padding: 10px;
+      }
+      .watchlist-info h3 {
+        font-size: 0.9rem;
+      }
+      .watchlist-actions {
+        gap: 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <h2>Movie cave</h2>
+  <ul>
+    <li><a href="../index.html">Home</a></li>
+    <li><a href="search.html">Search</a></li>
+    <li><a href="watchlist.html">Watchlist</a></li>
+    <li><a href="login.html">Login</a></li>
+    <li><a href="forum.html#forum-section">Forum</a></li>
+    <li><a href="news.html">News</a></li>
+  </ul>
+</nav>
+
+<!-- Genre Sidebar -->
+<aside class="genre-sidebar" id="genreSidebar">
+  <h3>🎭 Genres</h3>
+  <ul class="genre-list">
+    <li><a href="#" class="active" onclick="filterWatchlistByGenre('all', event)">All</a></li>
+    <li><a href="#" onclick="filterWatchlistByGenre('series', event)">Series</a></li>
+    <li><a href="#" onclick="filterWatchlistByGenre('action', event)">Action</a></li>
+    <li><a href="#" onclick="filterWatchlistByGenre('sci-fi', event)">Sci-Fi</a></li>
+    <li><a href="#" onclick="filterWatchlistByGenre('drama', event)">Drama</a></li>
+    <li><a href="#" onclick="filterWatchlistByGenre('comedy', event)">Comedy</a></li>
+    <li><a href="#" onclick="filterWatchlistByGenre('thriller', event)">Thriller</a></li>
+    <li><a href="#" onclick="filterWatchlistByGenre('adventure', event)">Adventure</a></li>
+    <li><a href="#" onclick="filterWatchlistByGenre('crime', event)">Crime</a></li>
+    <li><a href="#" onclick="filterWatchlistByGenre('romance', event)">Romance</a></li>
+    <li><a href="#" onclick="filterWatchlistByGenre('animation', event)">Animation</a></li>
+    <li><a href="#" onclick="filterWatchlistByGenre('superhero', event)">Superhero</a></li>
+    <li><a href="#" onclick="filterWatchlistByGenre('social', event)">Social</a></li>
+  </ul>
+</aside>
+
+<!-- Mobile Menu Toggle -->
+<button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+
+<!-- Main Content -->
+<div class="main-content-with-sidebar">
+<div class="watchlist-container">
+  <div class="watchlist-header">
+    <h1>📋 My Watchlist</h1>
+    <p style="color: #aaa; font-size: 1.1rem;">Movies and shows you want to watch later</p>
+  </div>
+  
+  <div id="watchlist"></div>
+</div>
+</div>
+
+<footer>
+  <p>© 2026 Movie cave</p>
+</footer>
+
+<script src="../js/script.js"></script>
+</body>
+</html>

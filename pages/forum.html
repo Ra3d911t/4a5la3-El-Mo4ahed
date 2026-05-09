@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reviews & Forum — Movie cave</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar">
+  <h2>Movie cave</h2>
+  <ul>
+    <li><a href="../index.html">Home</a></li>
+    <li><a href="search.html">Search</a></li>
+    <li><a href="watchlist.html">Watchlist</a></li>
+   
+    <li><a href="login.html">Login</a></li>
+    <li><a href="forum.html#forum-section">Forum</a></li>
+    <li><a href="news.html">News</a></li>
+  </ul>
+</nav>
+
+<main class="page-main">
+  <h1>Reviews &amp; Forum</h1>
+
+  <section class="page-section" id="reviews-section">
+    <h2>Reviews</h2>
+
+    <h3 style="font-size:1rem;color:#bbb;margin-bottom:12px;font-weight:normal;">Add a review</h3>
+    <form id="reviewForm" class="form-stack">
+      <label for="movieName">Movie name</label>
+      <input type="text" id="movieName" name="movieName" list="movieNameSuggestions" required placeholder="e.g. Inception" autocomplete="off">
+      <datalist id="movieNameSuggestions"></datalist>
+
+      <label for="rating">Rating (1–5)</label>
+      <select id="rating" name="rating" required>
+        <option value="5">5 — Excellent</option>
+        <option value="4">4 — Very good</option>
+        <option value="3">3 — Good</option>
+        <option value="2">2 — Fair</option>
+        <option value="1">1 — Poor</option>
+      </select>
+
+      <label for="reviewText">Your review</label>
+      <textarea id="reviewText" name="reviewText" required placeholder="Share your thoughts…"></textarea>
+
+      <button type="submit">Submit review</button>
+    </form>
+
+    <h3 style="font-size:1rem;color:#f5c518;margin-top:28px;margin-bottom:12px;">All reviews</h3>
+    <input type="text" id="reviewSearch" placeholder="Search reviews by movie name…" style="width:100%; margin: 0 0 12px 0; padding:10px 12px; border-radius:10px; background:#1a1a1a; color:white; border:1px solid #333;">
+    <div class="cards" id="reviewsList"></div>
+  </section>
+
+  <section class="page-section" id="forum-section">
+    <h2>Forum</h2>
+
+    <h3 style="font-size:1rem;color:#bbb;margin-bottom:12px;font-weight:normal;">New post</h3>
+    <form id="forumNewPostForm" class="form-stack">
+      <label for="postTitle">Title</label>
+      <input type="text" id="postTitle" required placeholder="Topic title">
+
+      <label for="postAuthor">Your name (optional)</label>
+      <input type="text" id="postAuthor" placeholder="Guest">
+
+      <label for="postBody">Message</label>
+      <textarea id="postBody" required placeholder="Write your post…"></textarea>
+
+      <button type="submit">Post</button>
+    </form>
+
+    <h3 style="font-size:1rem;color:#f5c518;margin-top:28px;margin-bottom:12px;">Discussions</h3>
+    <div id="forumPosts"></div>
+  </section>
+</main>
+
+<footer>
+  <p>© 2026 Movie cave</p>
+</footer>
+
+<script src="../js/script.js"></script>
+</body>
+</html>
